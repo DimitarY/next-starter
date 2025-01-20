@@ -35,7 +35,6 @@ export const uploadRouter = {
       return { userId: user.id as string, currentImageKey };
     })
     .onUploadComplete(async ({ file, metadata }) => {
-      // TODO: Callback request failed when we don't use SSL. Need to investigate.
       /**
        * Update the user's image in the database
        */

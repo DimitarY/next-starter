@@ -178,6 +178,7 @@ export function SignInForm({ className }: SignInFormProps) {
     },
   });
 
+  // FIXME: When using credentials login, the form is triggered and we make 2 request and error is present
   const onSubmit = async (values: z.infer<typeof MagicLinkSchema>) => {
     server_MagicLinkAction(values);
   };
