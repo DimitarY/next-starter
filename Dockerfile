@@ -34,30 +34,21 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# All environment variables that are used for t3-oss/env-nextjs
+# Accept environment variables as build arguments
+# All NEXT_PUBLIC_ environment variables have to be provided at build time
 ARG NEXT_PUBLIC_BASE_URL
-ARG DATABASE_URL
-ARG RESEND_API_KEY
-ARG RESEND_DOMAIN
-ARG CUID_FINGERPRINT
-ARG AUTH_URL
-ARG AUTH_SECRET
-ARG AUTH_GOOGLE_ID
-ARG AUTH_GOOGLE_SECRET
-ARG AUTH_GITHUB_ID
-ARG AUTH_GITHUB_SECRET
-ARG UPLOADTHING_TOKEN
+ENV NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
 
 # Build command based on lockfile
 RUN ls -la /app && \
   if [ -f yarn.lock ]; then \
-    yarn build; \
+    yarn build-docker; \
   elif [ -f package-lock.json ]; then \
-    npm run build; \
+    npm run build-docker; \
   elif [ -f pnpm-lock.yaml ]; then \
-    corepack enable pnpm && pnpm run build; \
+    corepack enable pnpm && pnpm run build-docker; \
   else \
-    echo "No valid lockfile found during build." && exit 1; \
+    echo "No valid lockfile found during build or build failed." && exit 1; \
   fi
 
 # Production image

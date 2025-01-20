@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev --turbopack --experimental-https",
     "build": "next build",
+    "build-docker": "cross-env SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
@@ -64,6 +65,7 @@
     "@types/node": "^22.10.3",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.1",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.28.1",
     "eslint": "^9.17.0",
     "eslint-config-next": "15.1.3",
