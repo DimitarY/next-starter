@@ -5,17 +5,23 @@ const nextConfig: NextConfig = {
   output: "standalone",
   images: {
     remotePatterns: [
+      // User uploaded images
       {
         protocol: "https",
         hostname: "utfs.io",
         // pathname: "/a/<APP_ID>/*", // Replace <APP_ID> with your app ID
       },
+      // Google OAuth profile images
       {
-        // TODO: This need to be edited
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
-        port: "",
-        pathname: "/**",
+        pathname: "/**", // Allow all Google profile images
+      },
+      // GitHub profile images
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        pathname: "/u/**", // GitHub user avatars use `/u/{userID}?...`
       },
     ],
   },

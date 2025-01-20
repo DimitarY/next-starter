@@ -15,6 +15,11 @@ export const SecuritySettings_Password = z.object({
   newPassword: z.string().min(1, "New password is required").trim(), // TODO: Add regex validation
 });
 
+export const SecuritySettings_SetPassword = z.object({
+  password: z.string().min(1, "Password is required").trim(),
+  confirmPassword: z.string().min(1, "Confirm password is required").trim(), // TODO: Add regex validation
+});
+
 export const DeleteProfile = z.object({
   accept: z.boolean().default(false).optional(),
 });

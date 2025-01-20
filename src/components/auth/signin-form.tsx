@@ -111,10 +111,7 @@ function CredentialsForm({ email }: { email?: string }) {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <div className="flex justify-between">
-                  <FormLabel>Password</FormLabel>
-                  <Link href="/auth/forgot-password">Forgot password?</Link>
-                </div>
+                <FormLabel>Password</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;"
@@ -243,10 +240,13 @@ export function SignInForm({ className }: SignInFormProps) {
         </Form>
       )}
       <div className="mt-1 gap-1 text-center text-sm font-medium">
-        <span>Don&#39;t have an account? </span>
-        <Link href="/auth/sign-up" className="underline">
-          Sign up
-        </Link>
+        <div>
+          <span>Don&#39;t have an account? </span>
+          <Link href="/auth/sign-up" className="underline">
+            Sign up
+          </Link>
+        </div>
+        <Link href="/auth/forgot-password">Forgot password?</Link>
       </div>
       <AuthErrorMessage className="mt-4" />
       <span className="text-foreground-lighter mt-4 text-xs sm:text-center">

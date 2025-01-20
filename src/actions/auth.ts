@@ -105,7 +105,15 @@ export const ForgotPasswordAction = async (
   const { email } = validatedFields.data;
 
   try {
-    // TODO: Need to check if user exists
+    const userExist = await CheckUserExistsByEmail(email);
+
+    if (!userExist) {
+      return {
+        success: false,
+        error: "No user found with the provided email address.",
+      };
+    }
+
     const { data, error } = await resend.emails.send({
       from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
       to: [email],

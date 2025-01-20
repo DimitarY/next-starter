@@ -23,7 +23,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { SecuritySettings_Password } from "@/schemas/settings";
+import {
+  SecuritySettings_Password,
+  SecuritySettings_SetPassword,
+} from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "next-auth/react";
@@ -192,6 +195,7 @@ function PasswordUpdateForm() {
           name="currentPassword"
           render={({ field }) => (
             <FormItem>
+              <FormLabel>Current Password</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -242,6 +246,130 @@ function PasswordUpdateForm() {
           disabled={server_PasswordUpdateIsPending}
         >
           Update password
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+function SetPasswordForm() {
+  const [success, setSuccess] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    let successTimer: NodeJS.Timeout | undefined;
+    let errorTimer: NodeJS.Timeout | undefined;
+
+    if (success) {
+      successTimer = setTimeout(() => {
+        setSuccess("");
+      }, 5000);
+    }
+
+    if (error) {
+      errorTimer = setTimeout(() => {
+        setError("");
+      }, 5000);
+    }
+
+    // Cleanup both timers
+    return () => {
+      if (successTimer) clearTimeout(successTimer);
+      if (errorTimer) clearTimeout(errorTimer);
+    };
+  }, [success, error]);
+
+  const {
+    mutate: server_SetPasswordAction,
+    isPending: server_SetPasswordIsPending,
+  } = useMutation({
+    mutationFn: async (
+      values: z.infer<typeof SecuritySettings_SetPassword>,
+    ) => {
+      // Simulate API call (replace with actual API request logic)
+      console.log(values);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ success: true });
+        }, 1000);
+      });
+    },
+    onMutate: () => {
+      setSuccess("");
+      setError("");
+    },
+    onSuccess: () => {
+      setSuccess("Profile information updated successfully");
+    },
+    onError: () => {
+      setError("An unexpected error occurred. Please try again.");
+    },
+    onSettled: () => {
+      form.setValue("password", "");
+      form.setValue("confirmPassword", "");
+    },
+  });
+
+  const form = useForm<z.infer<typeof SecuritySettings_SetPassword>>({
+    resolver: zodResolver(SecuritySettings_SetPassword),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onSubmit = async (
+    values: z.infer<typeof SecuritySettings_SetPassword>,
+  ) => {
+    server_SetPasswordAction(values);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Set Password</FormLabel>
+              {/*TODO: Add password strength meter*/}
+              <FormControl>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={server_SetPasswordIsPending}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={server_SetPasswordIsPending}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormSuccess message={success} />
+        <FormError message={error} />
+        <Button
+          variant="default"
+          type="submit"
+          disabled={server_SetPasswordIsPending}
+        >
+          Set Password
         </Button>
       </form>
     </Form>
@@ -329,8 +457,9 @@ export function SecuritySettings({
       </CardHeader>
       <CardContent>
         <ModuleWrapper>
-          {/*TODO: Creat option to create a password is user don't have*/}
-          {isMagicLinkEnabled || (UsePassword && <PasswordUpdateForm />)}
+          {isMagicLinkEnabled || (UsePassword && <PasswordUpdateForm />) || (
+            <SetPasswordForm />
+          )}
           <ConnectSocialButtons
             connectedAccounts={Accounts}
             emailVerified={EmailVerified}
