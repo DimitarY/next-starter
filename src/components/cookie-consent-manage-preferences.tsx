@@ -1,6 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { siteConfig } from "@/config/site";
 import {
@@ -11,7 +16,7 @@ import {
   getLearnMoreLink,
 } from "@/utils/cookie-consent";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function CookieConsentManagePreferences() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -86,7 +91,7 @@ export default function CookieConsentManagePreferences() {
         </button>
       </DialogTrigger>
       <DialogContent className="w-[400px] p-6">
-        <h2 className="text-lg font-semibold">Privacy Settings</h2>
+        <DialogTitle>Privacy Settings</DialogTitle>
         <hr />
         <div className="space-y-4">
           <div className="flex justify-between gap-5">
@@ -108,9 +113,9 @@ export default function CookieConsentManagePreferences() {
               const learnMoreLink = getLearnMoreLink(consentKey);
 
               return (
-                <>
+                <React.Fragment key={consentKey}>
                   <hr className="my-4" />
-                  <div className="flex justify-between gap-5" key={consentKey}>
+                  <div className="flex justify-between gap-5">
                     <Switch
                       checked={consentStates[consentKey]}
                       onCheckedChange={(checked: boolean) =>
@@ -127,7 +132,7 @@ export default function CookieConsentManagePreferences() {
                       </span>
                     </div>
                   </div>
-                </>
+                </React.Fragment>
               );
             })}
           </div>
