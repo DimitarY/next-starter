@@ -1,3 +1,4 @@
+import CookieConsentManagePreferences from "@/components/cookie-consent-manage-preferences";
 import {
   Table,
   TableBody,
@@ -155,11 +156,7 @@ export default function PrivacyPolicy() {
           <p className="text-gray-600 dark:text-gray-300">
             We use Analytics cookies to collect information to assess how our
             Service is used. We will only do so, however, only if you give us
-            your consent to do so.{" "}
-            {/* TODO: Add button to manage preferences */}
-            <button className="text-blue-500 underline dark:text-blue-400">
-              Manage preferences
-            </button>
+            your consent to do so. <CookieConsentManagePreferences />
           </p>
 
           <p className="text-gray-600 dark:text-gray-300">

@@ -2,69 +2,48 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { consentList } from "@/utils/cookie-consent";
 import { CookieIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// Utility function to set expiration date
-const getCookieExpirationDate = (months = 6) => {
-  const date = new Date();
-  date.setMonth(date.getMonth() + months);
-  return date.toUTCString();
+// Utility function to set local storage values
+const setConsentStatus = (keys: string[], value: string) => {
+  keys.forEach((key) => {
+    localStorage.setItem(key, value);
+  });
 };
 
-export default function CookieConsent({
-  variant = "default",
-  onAcceptCallback = () => {},
-  onDeclineCallback = () => {},
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [hide, setHide] = useState(false);
+// Utility function to check if all consents exist in local storage
+const areAllConsentsSet = (keys: string[]): boolean => {
+  return keys.every((key) => localStorage.getItem(key) !== null);
+};
+
+export default function CookieConsent() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [hide, setHide] = useState<boolean>(false);
 
   const accept = () => {
-    const expirationDate = getCookieExpirationDate();
+    setConsentStatus(consentList, "true");
     setIsOpen(false);
-    document.cookie = `cookieConsent=true; expires=${expirationDate}; path=/; SameSite=Lax; Secure`;
-    setTimeout(() => {
-      setHide(true);
-    }, 700);
-    onAcceptCallback();
+    setTimeout(() => setHide(true), 700);
   };
 
   const decline = () => {
-    const expirationDate = getCookieExpirationDate();
+    setConsentStatus(consentList, "false");
     setIsOpen(false);
-    document.cookie = `cookieConsent=false; expires=${expirationDate}; path=/; SameSite=Lax; Secure`;
-    setTimeout(() => {
-      setHide(true);
-    }, 700);
-    onDeclineCallback();
+    setTimeout(() => setHide(true), 700);
   };
 
   useEffect(() => {
-    try {
-      const cookieConsent = document.cookie.includes("cookieConsent=");
-
-      if (cookieConsent) {
-        if (document.cookie.includes("cookieConsent=true")) {
-          setIsOpen(false);
-          setTimeout(() => {
-            setHide(true);
-          }, 700);
-        } else if (document.cookie.includes("cookieConsent=false")) {
-          setHide(true);
-        } else {
-          setIsOpen(true);
-        }
-      } else {
-        setIsOpen(true);
-      }
-    } catch (e) {
-      console.log("Cookie Consent Error:", e);
+    if (areAllConsentsSet(consentList)) {
+      setHide(true);
+    } else {
+      setIsOpen(true);
     }
   }, []);
 
-  return variant == "default" ? (
+  return (
     <div
       className={cn(
         "fixed bottom-0 left-0 right-0 z-[200] w-full duration-700 sm:bottom-4 sm:left-4 sm:max-w-md",
@@ -109,43 +88,5 @@ export default function CookieConsent({
         </div>
       </div>
     </div>
-  ) : (
-    variant == "small" && (
-      <div
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-[200] w-full duration-700 sm:bottom-4 sm:left-4 sm:max-w-md",
-          !isOpen
-            ? "translate-y-8 opacity-0 transition-[opacity,transform]"
-            : "translate-y-0 opacity-100 transition-[opacity,transform]",
-          hide && "hidden",
-        )}
-      >
-        <div className="m-3 rounded-lg border border-border bg-background dark:bg-card">
-          <div className="flex items-center justify-between p-3">
-            <h1 className="text-lg font-medium">We use cookies</h1>
-            <CookieIcon className="h-[1.2rem] w-[1.2rem]" />
-          </div>
-          <div className="-mt-2 p-3">
-            <p className="text-left text-sm text-muted-foreground">
-              We use cookies to ensure you get the best experience on our
-              website. For more information on how we use cookies, please see
-              our cookie policy.
-            </p>
-          </div>
-          <div className="mt-2 flex items-center gap-2 border-t p-3">
-            <Button onClick={accept} className="h-9 w-full rounded-full">
-              accept
-            </Button>
-            <Button
-              onClick={decline}
-              className="h-9 w-full rounded-full"
-              variant="outline"
-            >
-              decline
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
   );
 }
