@@ -1,5 +1,6 @@
 "use client";
 
+import { DisconnectAccountAction } from "@/actions/auth";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -30,6 +31,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -52,11 +54,33 @@ export function ConnectSocialButtons({
 }: ConnectSocialButtonsProps) {
   const [error, setError] = useState<string | undefined>("");
 
+  const router = useRouter();
+
+  const {
+    mutate: server_DisconnectAccountAction,
+    isPending: server_DisconnectAccountActionIsPending,
+  } = useMutation({
+    mutationFn: DisconnectAccountAction,
+    onMutate: () => {
+      setError("");
+    },
+    onSuccess: async (data) => {
+      if (!data.success) {
+        setError(data.error);
+      } else {
+        router.refresh();
+      }
+    },
+    onError: () => {
+      setError("An unexpected error occurred. Please try again.");
+    },
+  });
+
   const onClick = (provider: "google" | "github") => {
     setError("");
     if (connectedAccounts.includes(provider)) {
       if (connectedAccounts.length > 1 || emailVerified || usePassword) {
-        // TODO: Add logic to remove account connection
+        server_DisconnectAccountAction(provider);
       } else {
         setError(
           "Your can not disconnect from every account without verified email!",
@@ -82,6 +106,7 @@ export function ConnectSocialButtons({
         className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-white dark:text-black dark:hover:bg-gray-100"
         variant="link"
         onClick={() => onClick("google")}
+        disabled={server_DisconnectAccountActionIsPending}
       >
         <FcGoogle className="h-5 w-5" />{" "}
         {connectedAccounts.includes("google") ? "Disconnect" : "Connect"} with
@@ -92,6 +117,7 @@ export function ConnectSocialButtons({
         className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-gray-800"
         variant="link"
         onClick={() => onClick("github")}
+        disabled={server_DisconnectAccountActionIsPending}
       >
         <VscGithubAlt className="h-5 w-5" />
         {connectedAccounts.includes("github") ? "Disconnect" : "Connect"} with

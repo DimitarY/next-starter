@@ -9,6 +9,7 @@ import {
   CheckUserExistsByEmail,
   RegisterUserByEmail,
 } from "@/db/querys";
+import { account } from "@/db/schema/account";
 import { user } from "@/db/schema/user";
 import { env } from "@/env";
 import { hashPassword, validateSession } from "@/lib/authUtils";
@@ -20,7 +21,7 @@ import {
   RegisterSchema,
 } from "@/schemas/auth";
 import { utapi } from "@/uploadthing/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -208,3 +209,30 @@ export async function RemoveUserImageAction() {
 
   revalidatePath("/", "layout");
 }
+
+export const DisconnectAccountAction = async (
+  provider: string,
+): Promise<{ success: true } | { success: false; error: string }> => {
+  try {
+    const session = await validateSession();
+
+    const deletedAccount = await db
+      .delete(account)
+      .where(
+        and(
+          eq(account.userId, session.user.id as string),
+          eq(account.provider, provider),
+        ),
+      )
+      .returning();
+
+    if (deletedAccount) {
+      return { success: true };
+    }
+    return { success: false, error: "Something went wrong!" };
+  } catch (error) {
+    console.error("Error disconnecting account:", error);
+
+    return { success: false, error: "Something went wrong!" };
+  }
+};
