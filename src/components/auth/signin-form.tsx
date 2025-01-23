@@ -30,8 +30,100 @@ interface SignInFormProps {
   className?: string;
 }
 
+function MagicLinkForm({
+  onShowCredentials,
+}: {
+  onShowCredentials: (email: string) => void;
+}) {
+  const [success, setSuccess] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  const {
+    mutate: server_MagicLinkAction,
+    isPending: server_MagicLinkIsPending,
+  } = useMutation({
+    mutationFn: MagicLinkAction,
+    onMutate: () => {
+      setError("");
+    },
+    onSuccess: async (data) => {
+      if (!data.success) {
+        setError(data.error);
+      } else {
+        if (data.useCredentials) {
+          // Call the function to show the CredentialsForm and pass the email
+          onShowCredentials(form.getValues().email);
+        } else {
+          setSuccess("Magic link has been sent");
+        }
+      }
+    },
+    onError: () => {
+      setError("An unexpected error occurred. Please try again.");
+    },
+  });
+
+  const form = useForm<z.infer<typeof MagicLinkSchema>>({
+    resolver: zodResolver(MagicLinkSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof MagicLinkSchema>) => {
+    server_MagicLinkAction(values);
+  };
+
+  const { setFocus } = form;
+
+  // Focus password field when an error is set
+  useEffect(() => {
+    if (error) {
+      setFocus("email");
+    }
+  }, [error, setFocus]);
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="you@example.com"
+                    {...field}
+                    type="email"
+                    disabled={server_MagicLinkIsPending}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormError message={error} />
+          <FormSuccess message={success} />
+          <Button
+            className="w-full"
+            variant="default"
+            type="submit"
+            disabled={server_MagicLinkIsPending}
+          >
+            Login
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
 function CredentialsForm({ email }: { email?: string }) {
   const search = useSearchParams();
+  const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const { mutate: server_LoginAction, isPending: server_LoginActionIsPending } =
@@ -44,8 +136,7 @@ function CredentialsForm({ email }: { email?: string }) {
         if (!data.success) {
           setError(data.error);
         } else {
-          const callbackUrl = search.get("callbackUrl");
-          await navigate(callbackUrl || "/");
+          setSuccess(true);
         }
       },
       onError: () => {
@@ -69,6 +160,18 @@ function CredentialsForm({ email }: { email?: string }) {
   };
 
   const { setFocus } = form;
+
+  // Redirect to the callbackUrl or the home page after successful login
+  useEffect(() => {
+    const performRedirect = async () => {
+      if (success) {
+        const callbackUrl = search.get("callbackUrl");
+        await navigate(callbackUrl || "/");
+      }
+    };
+
+    performRedirect();
+  }, [success]);
 
   // Focus password field when email is provided
   useEffect(() => {
@@ -141,53 +244,13 @@ function CredentialsForm({ email }: { email?: string }) {
 
 export function SignInForm({ className }: SignInFormProps) {
   const [credentialLogin, setCredentialsLogin] = useState<boolean>(false);
-  const [success, setSuccess] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
-  const {
-    mutate: server_MagicLinkAction,
-    isPending: server_MagicLinkIsPending,
-  } = useMutation({
-    mutationFn: MagicLinkAction,
-    onMutate: () => {
-      setError("");
-    },
-    onSuccess: async (data) => {
-      if (!data.success) {
-        setError(data.error);
-      } else {
-        if (data.useCredentials) {
-          setCredentialsLogin(true);
-        } else {
-          setSuccess("Magic link has been sent");
-        }
-      }
-    },
-    onError: () => {
-      setError("An unexpected error occurred. Please try again.");
-    },
-  });
-
-  const form = useForm<z.infer<typeof MagicLinkSchema>>({
-    resolver: zodResolver(MagicLinkSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  // FIXME: When using credentials login, the form is triggered and we make 2 request and error is present
-  const onSubmit = async (values: z.infer<typeof MagicLinkSchema>) => {
-    server_MagicLinkAction(values);
+  // This function is passed to the MagicLinkForm to update the state when credentials are required
+  const handleShowCredentials = (email: string) => {
+    setCredentialsLogin(true);
+    setEmail(email);
   };
-
-  const { setFocus } = form;
-
-  // Focus password field when an error is set
-  useEffect(() => {
-    if (error) {
-      setFocus("email");
-    }
-  }, [error, setFocus]);
 
   return (
     <div className={cn("flex flex-col justify-center gap-1 p-4", className)}>
@@ -201,44 +264,11 @@ export function SignInForm({ className }: SignInFormProps) {
       <div className="mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400">
         or
       </div>
-      {(credentialLogin && (
-        <CredentialsForm email={form.getValues().email} />
-      )) || (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="you@example.com"
-                        {...field}
-                        type="email"
-                        disabled={server_MagicLinkIsPending}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormSuccess message={success} />
-              <FormError message={error} />
-              <Button
-                className="w-full"
-                variant="default"
-                type="submit"
-                disabled={server_MagicLinkIsPending}
-              >
-                Login
-              </Button>
-            </div>
-          </form>
-        </Form>
-      )}
+      {credentialLogin ? (
+        <CredentialsForm email={email} />
+      ) : (
+        <MagicLinkForm onShowCredentials={handleShowCredentials} />
+      )}{" "}
       <div className="mt-1 gap-1 text-center text-sm font-medium">
         <div>
           <span>Don&#39;t have an account? </span>

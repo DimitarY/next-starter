@@ -50,10 +50,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
       if (!data.success) {
         setError(data.error);
       } else {
-        const callbackUrl = search.get("callbackUrl");
         setSuccess("Registration successful");
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await navigate(callbackUrl || "/auth/sign-in");
       }
     },
     onError: () => {
@@ -79,6 +76,19 @@ export function SignUpForm({ className }: SignUpFormProps) {
   };
 
   const { setFocus } = form;
+
+  // Redirect to the callbackUrl or sign in page after successful registration
+  useEffect(() => {
+    const performRedirect = async () => {
+      if (success) {
+        const callbackUrl = search.get("callbackUrl");
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await navigate(callbackUrl || "/auth/sign-in");
+      }
+    };
+
+    performRedirect();
+  }, [success]);
 
   // Focus password field when an error is set
   useEffect(() => {
