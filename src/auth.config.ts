@@ -1,4 +1,4 @@
-import { MagicLinkEmail } from "@/components/email-template";
+import MagicLinkEmail from "@/components/emails/magic-link";
 import { siteConfig } from "@/config/site";
 import { GetUserByEmail } from "@/db/querys";
 import { UserInterface } from "@/db/schema/user";

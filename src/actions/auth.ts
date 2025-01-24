@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn, unstable_update } from "@/auth";
-import { PasswordResetEmail } from "@/components/email-template";
+import PasswordResetEmail from "@/components/emails/password-reset";
 import { siteConfig } from "@/config/site";
 import { db } from "@/db";
 import {

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack --experimental-https",
+    "dev:email": "cp .env ./node_modules/react-email/dist/preview && echo 'SKIP_ENV_VALIDATION=true' >> .env && email dev --port 5000 --dir src/components/emails",
     "build": "next build",
     "build-docker": "cross-env SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
@@ -75,6 +76,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "react-email": "3.0.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
   }
