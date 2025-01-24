@@ -61,6 +61,9 @@ function MagicLinkForm({
     onError: () => {
       setError("An unexpected error occurred. Please try again.");
     },
+    onSettled: () => {
+      form.setValue("email", "");
+    },
   });
 
   const form = useForm<z.infer<typeof MagicLinkSchema>>({

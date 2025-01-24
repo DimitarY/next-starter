@@ -1,13 +1,19 @@
+import { MagicLinkEmail } from "@/components/email-template";
+import { siteConfig } from "@/config/site";
 import { GetUserByEmail } from "@/db/querys";
 import { UserInterface } from "@/db/schema/user";
+import { env } from "@/env";
 import { comparePassword } from "@/lib/authUtils";
+import { resend } from "@/lib/resend";
 import { LoginSchema } from "@/schemas/auth";
 import { NextAuthConfig, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import Resend from "next-auth/providers/resend";
 
 export const SessionMaxAge = 60 * 60 * 24 * 30; // 30 days
+export const MagicLinkMaxAge = 60 * 60; // 1 hour
 
 export default {
   providers: [
@@ -73,12 +79,31 @@ export default {
     }),
     Google,
     Github,
+    Resend({
+      maxAge: MagicLinkMaxAge,
+      from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>` as string,
+      async sendVerificationRequest({
+        identifier: email,
+        url,
+        provider: { from },
+      }) {
+        const { data, error } = await resend.emails.send({
+          from: from as string,
+          to: [email],
+          subject: `Sign in to ${siteConfig.name}`,
+          react: MagicLinkEmail({ magicLink: url }),
+        });
+
+        // TODO: Handle error
+        console.log("data:", data);
+        console.log("error", error);
+      },
+    }),
   ],
   pages: {
     signIn: "/auth/sign-in",
     error: "/auth/error",
     signOut: "/auth/sign-out",
-    // verifyRequest: "/auth/verify-request", // TODO: Create this page
   },
   session: {
     maxAge: SessionMaxAge,

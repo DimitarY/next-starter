@@ -122,6 +122,7 @@ export const ForgotPasswordAction = async (
       react: PasswordResetEmail({ resetLink: "https://example.com" }),
     });
 
+    // TODO: Handle error
     console.log("data:", data);
     console.log("error", error);
 
@@ -164,7 +165,10 @@ export const MagicLinkAction = async (
     } else if (!useMagicLink) {
       return { success: true, useCredentials: true };
     } else {
-      // TODO: Send magic link
+      signIn("resend", {
+        email,
+        redirect: false,
+      });
       return { success: true, useCredentials: false };
     }
   } catch (error) {
