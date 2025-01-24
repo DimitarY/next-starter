@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack --experimental-https",
-    "dev:email": "cp .env ./node_modules/react-email/dist/preview && echo 'SKIP_ENV_VALIDATION=true' >> .env && email dev --port 5000 --dir src/components/emails",
+    "dev:email": "cp .env ./node_modules/react-email/dist/preview && echo 'SKIP_ENV_VALIDATION=true' >> ./node_modules/react-email/dist/preview/.env && email dev --port 5000 --dir src/components/emails",
     "build": "next build",
     "build-docker": "cross-env SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
