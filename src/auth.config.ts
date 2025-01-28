@@ -1,10 +1,9 @@
-import MagicLinkEmail from "@/components/emails/magic-link";
 import { siteConfig } from "@/config/site";
 import { GetUserByEmail } from "@/db/querys";
 import { UserInterface } from "@/db/schema/user";
 import { env } from "@/env";
+import { sendVerificationRequest } from "@/lib/authSendRequest";
 import { comparePassword } from "@/lib/authUtils";
-import { resend } from "@/lib/resend";
 import { LoginSchema } from "@/schemas/auth";
 import { NextAuthConfig, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
@@ -87,16 +86,11 @@ export default {
         url,
         provider: { from },
       }) {
-        const { data, error } = await resend.emails.send({
-          from: from as string,
-          to: [email],
-          subject: `Sign in to ${siteConfig.name}`,
-          react: MagicLinkEmail({ magicLink: url }),
+        await sendVerificationRequest({
+          identifier: email,
+          provider: { from: from as string },
+          url,
         });
-
-        // TODO: Handle error
-        console.log("data:", data);
-        console.log("error", error);
       },
     }),
   ],
