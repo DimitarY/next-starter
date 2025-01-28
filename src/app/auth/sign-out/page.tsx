@@ -13,7 +13,7 @@ import {
 import auth from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-export default async function Logout() {
+export default async function Signout() {
   const session = await auth();
 
   if (!session) {
@@ -23,12 +23,13 @@ export default async function Logout() {
   const userEmail = session.user.email as string;
   const profileImage = session.user?.image as string;
 
+  // FIXME: Vertical centering is broken
   return (
-    <div className="flex h-full-without-header w-full flex-col items-center justify-center">
+    <div className="flex flex-grow items-center justify-center px-4">
       <form
         action={async () => {
           "use server";
-          await signOut().then(redirect("/"));
+          await signOut().then(() => redirect("/"));
         }}
       >
         <Card className="w-[350px]">

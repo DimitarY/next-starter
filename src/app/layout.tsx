@@ -36,7 +36,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NextSSRPlugin routerConfig={extractRouterConfig(uploadRouter)} />
-          <header className="flex h-header w-full shrink-0 items-center px-4 md:px-6">
+          <header className="flex w-full shrink-0 items-center px-4 py-4 md:px-6">
             <MainNav items={siteConfig.mainNav} session={session} />
           </header>
           <ReactQueryClientProvider>
