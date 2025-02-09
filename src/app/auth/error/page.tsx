@@ -10,7 +10,7 @@ export default async function AuthError() {
   }
 
   return (
-    <div className="flex h-full-without-header w-full flex-col items-center justify-center">
+    <div className="h-full-without-header flex w-full flex-col items-center justify-center">
       <AuthErrorMessage />
     </div>
   );
