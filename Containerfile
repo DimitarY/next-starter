@@ -65,12 +65,12 @@ ENV HOSTNAME="0.0.0.0"
 
 # Add app-specific user
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN adduser --system --uid 1001 --disabled-password --gecos "" nextjs
 
 # Copy build artifacts and public files
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=1001:1001 /app/.next/standalone ./
+COPY --from=builder --chown=1001:1001 /app/.next/static ./.next/static
 
 # Use app-specific user
 USER nextjs

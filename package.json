@@ -7,7 +7,7 @@
     "node": ">=22.x",
     "pnpm": "10.x"
   },
-  "packageManager": "pnpm@10.2.1",
+  "packageManager": "pnpm@10.4.0",
   "scripts": {
     "dev": "next dev --turbopack --experimental-https",
     "dev:email": "cp .env ./node_modules/react-email/dist/preview && echo 'SKIP_ENV_VALIDATION=true' >> ./node_modules/react-email/dist/preview/.env && email dev --port 5000 --dir src/components/emails",

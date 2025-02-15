@@ -1,0 +1,71 @@
+name: CI
+
+env:
+  NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  RESEND_DOMAIN: ${{ secrets.RESEND_DOMAIN }}
+  CUID_FINGERPRINT: ${{ secrets.CUID_FINGERPRINT }}
+  AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+  AUTH_URL: ${{ secrets.AUTH_URL }}
+  AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
+  AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
+  AUTH_GITHUB_ID: ${{ secrets.AUTH_GITHUB_ID }}
+  AUTH_GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET }}
+  UPLOADTHING_TOKEN: ${{ secrets.UPLOADTHING_TOKEN }}
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+  container-build:
+    name: "Container Build"
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: quay.io/podman/stable
+      options: --privileged
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Podman Build
+        env:
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+        run: |
+          podman build \
+            --tag ghcr.io/dimitary/next-starter:ci \
+            --build-arg NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL} \
+            --platform linux/amd64 .
