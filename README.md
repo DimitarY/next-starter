@@ -1,114 +1,121 @@
-# Getting Started
+# Next Starter
 
-## Environment Variable Setup
+Example Next.js project with shadcn/ui using better-auth, Drizzle ORM, and TanStack Query.
 
-Follow these steps to set up environment variables:
+## Environment Variables
 
-### 1. Create a `.env` file
+To run this project, you will need to configure the following environment variables.
 
-#### On Linux:
+### .env
 
-```bash
-touch .env
-```
+| Environment Variable Name          | Description                                                              |
+|------------------------------------|--------------------------------------------------------------------------|
+| `NEXT_PUBLIC_BASE_URL`             | The base URL for the application, e.g., `https://localhost:3000`.        |
+| `DATABASE_URL`                     | The connection string for the database.                                  |
+| `RESEND_API_KEY`                   | API key for the Resend service.                                          |
+| `RESEND_DOMAIN`                    | Domain for the Resend email service.                                     |
+| `BETTER_AUTH_URL`                  | The base URL for BetterAuth, e.g., `https://localhost:3000`.             |
+| `BETTER_AUTH_SECRET`               | A random value used by the library for encryption and generating hashes. |
+| `BETTER_AUTH_GOOGLE_CLIENT_ID`     | Google OAuth client ID.                                                  |
+| `BETTER_AUTH_GOOGLE_CLIENT_SECRET` | Google OAuth client secret.                                              |
+| `BETTER_AUTH_GITHUB_CLIENT_ID`     | GitHub OAuth client ID.                                                  |
+| `BETTER_AUTH_GITHUB_CLIENT_SECRET` | GitHub OAuth client secret.                                              |
+| `UPLOADTHING_TOKEN`                | API token for the UploadThing service.                                   |
 
-#### On Windows:
+### .env.development
 
-```bash
-type nul > .env
-```
+| Environment Variable Name | Description                                                   |
+|---------------------------|---------------------------------------------------------------|
+| `NEXT_PUBLIC_BASE_URL`    | Override the `.env` value for development.                    |
+| `BETTER_AUTH_URL`         | Override the `.env` value for development.                    |
+| `LOCAL_DNS_RECORD`        | If using a local DNS record for development, specify it here. |
 
-### 2. Define the following environment variables in the `.env` file:
+### .env.production
 
-| Environment Variable Name | Description                                |
-| ------------------------- | ------------------------------------------ |
-| `DATABASE_URL`            | Connection string for the database         |
-| `RESEND_API_KEY`          | API key for Resend service                 |
-| `RESEND_DOMAIN`           | Domain for Resend email service            |
-| `CUID_FINGERPRINT`        | Fingerprint token for CUID generation      |
-| `AUTH_URL`                | Set to `${NEXT_PUBLIC_BASE_URL}`           |
-| `AUTH_SECRET`             | Authentication secret for session handling |
-| `AUTH_GOOGLE_ID`          | Google OAuth client ID                     |
-| `AUTH_GOOGLE_SECRET`      | Google OAuth client secret                 |
-| `AUTH_GITHUB_ID`          | GitHub OAuth client ID                     |
-| `AUTH_GITHUB_SECRET`      | GitHub OAuth client secret                 |
-| `UPLOADTHING_TOKEN`       | API token for UploadThing service          |
+| Environment Variable Name  | Description                                                                                                                                                  |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `NEXT_PUBLIC_BASE_URL`     | Override the `.env` value for production.                                                                                                                    |
+| `BETTER_AUTH_URL`          | Override the `.env` value for production.                                                                                                                    |
+| `UPLOADTHING_CALLBACK_URL` | The callback URL for UploadThing in production. See [documentation](https://docs.uploadthing.com/faq#my-callback-runs-in-development-but-not-in-production). |
 
-### 3. Create a `.env.development` file
+### .env.container
 
-#### On Linux:
+| Environment Variable Name          | Description                                                                                                                                                  |
+|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `NEXT_PUBLIC_BASE_URL`             | The base URL for production build.                                                                                                                           |
+| `DATABASE_URL`                     | The connection string for the database.                                                                                                                      |
+| `RESEND_API_KEY`                   | API key for the Resend service.                                                                                                                              |
+| `RESEND_DOMAIN`                    | Domain for the Resend email service.                                                                                                                         |
+| `BETTER_AUTH_URL`                  | The base URL for BetterAuth, same as `NEXT_PUBLIC_BASE_URL`.                                                                                                 |
+| `BETTER_AUTH_SECRET`               | A random value used by the library for encryption and generating hashes.                                                                                     |
+| `BETTER_AUTH_GOOGLE_CLIENT_ID`     | Google OAuth client ID.                                                                                                                                      |
+| `BETTER_AUTH_GOOGLE_CLIENT_SECRET` | Google OAuth client secret.                                                                                                                                  |
+| `BETTER_AUTH_GITHUB_CLIENT_ID`     | GitHub OAuth client ID.                                                                                                                                      |
+| `BETTER_AUTH_GITHUB_CLIENT_SECRET` | GitHub OAuth client secret.                                                                                                                                  |
+| `UPLOADTHING_TOKEN`                | API token for the UploadThing service.                                                                                                                       |
+| `UPLOADTHING_CALLBACK_URL`         | The callback URL for UploadThing in production. See [documentation](https://docs.uploadthing.com/faq#my-callback-runs-in-development-but-not-in-production). |
 
-```bash
-touch .env.development
-```
+### Additional environment variables
 
-#### On Windows:
+| Environment Variable Name               | Description                                            |
+|-----------------------------------------|--------------------------------------------------------|
+| `MAGIC_LINK_EXPIRES_IN_SECONDS`         | Used to change the expires time for Magic Link         |
+| `EMAIL_VERIFICATION_EXPIRES_IN_SECONDS` | Used to change the expires time for Email Verification |
 
-```bash
-type nul > .env.development
-```
+## Run Locally
 
-### 4. Define the following environment variables in the `.env.development` file:
-
-| Environment Variable Name | Description                       |
-| ------------------------- | --------------------------------- |
-| `NEXT_PUBLIC_BASE_URL`    | Base URL for the development site |
-| `UPLOADTHING_IS_DEV`      | Set to `true` for development     |
-
-### 5. Create a `.env.production` file
-
-#### On Linux:
-
-```bash
-touch .env.production
-```
-
-#### On Windows:
-
-```bash
-type nul > .env.production
-```
-
-### 6. Define the following environment variables in the `.env.production` file:
-
-| Environment Variable Name  | Description                                                                                                                               |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_BASE_URL`     | Base URL for the production site                                                                                                          |
-| `UPLOADTHING_CALLBACK_URL` | Callback URL for UploadThing, see [documentation](https://docs.uploadthing.com/faq#my-callback-runs-in-development-but-not-in-production) |
-
----
-
-## Install Dependencies
-
-Before running the development server, make sure to install the required packages. In your project directory, run:
+Clone the project
 
 ```bash
-pnpm install
+  git clone https://github.com/DimitarY/next-starter
 ```
 
----
-
-## Quick Start
-
-To start the development server, use the following command:
+Install dependencies
 
 ```bash
-pnpm dev
+  pnpm install
 ```
 
-Then, open [https://localhost:3000](https://localhost:3000) in your browser to view the application.
+Start development server
 
----
+```bash
+  pnpm dev
+```
 
-## Additional Information
+Build container
 
-### Styling
+```bash
+  podman build \
+  --tag ghcr.io/dimitary/next-starter \
+  --build-arg NEXT_PUBLIC_BASE_URL=$(grep NEXT_PUBLIC_BASE_URL .env.container | cut -d '=' -f2) \
+  --platform linux/amd64 \
+  .
+```
 
-The site is styled using:
+Start container
 
-- [`Tailwind CSS`](https://tailwindcss.com) for utility-first CSS.
-- [`shadcn/ui`](https://ui.shadcn.com/) for advanced user interface components. Note that these components have been customized for this project.
+```bash
+  podman run -d \
+  -p 3000:3000 \
+  --restart unless-stopped \
+  --name next-starter-container \
+  -e NEXT_PUBLIC_BASE_URL=$(grep NEXT_PUBLIC_BASE_URL .env.container | cut -d '=' -f2) \
+  -e DATABASE_URL=$(grep DATABASE_URL .env.container | cut -d '=' -f2) \
+  -e RESEND_API_KEY=$(grep RESEND_API_KEY .env.container | cut -d '=' -f2) \
+  -e RESEND_DOMAIN=$(grep RESEND_DOMAIN .env.container | cut -d '=' -f2) \
+  -e BETTER_AUTH_URL=$(grep BETTER_AUTH_URL .env.container | cut -d '=' -f2) \
+  -e BETTER_AUTH_SECRET=$(grep BETTER_AUTH_SECRET .env.container | cut -d '=' -f2) \
+  -e BETTER_AUTH_GOOGLE_CLIENT_ID=$(grep BETTER_AUTH_GOOGLE_CLIENT_ID .env.container | cut -d '=' -f2) \
+  -e BETTER_AUTH_GOOGLE_CLIENT_SECRET=$(grep BETTER_AUTH_GOOGLE_CLIENT_SECRET .env.container | cut -d '=' -f2) \
+  -e BETTER_AUTH_GITHUB_CLIENT_ID=$(grep BETTER_AUTH_GITHUB_CLIENT_ID .env.container | cut -d '=' -f2) \
+  -e BETTER_AUTH_GITHUB_CLIENT_SECRET=$(grep BETTER_AUTH_GITHUB_CLIENT_SECRET .env.container | cut -d '=' -f2) \
+  -e UPLOADTHING_TOKEN=$(grep UPLOADTHING_TOKEN .env.container | cut -d '=' -f2) \
+  -e UPLOADTHING_CALLBACK_URL=$(grep UPLOADTHING_CALLBACK_URL .env.container | cut -d '=' -f2) \
+  ghcr.io/dimitary/next-starter
+```
 
-### Authentication
+Remove **Dangling** images
 
-Authentication functionality is powered by [`Auth.js`](https://authjs.dev/).
+```bash
+  podman images --filter "dangling=true" --quiet | xargs podman rmi
+```
