@@ -2,21 +2,51 @@ import { DeleteAccount } from "@/components/profile/delete-account";
 import { GeneralSettings } from "@/components/profile/general-settings";
 import { ProfilePictureCard } from "@/components/profile/profile-picture";
 import { SecuritySettings } from "@/components/profile/security-settings";
-import Auth from "@/lib/auth";
+import { db } from "@/db";
+import { account } from "@/db/schema/account";
+import { user } from "@/db/schema/user";
+import { auth } from "@/lib/auth";
+import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm/sql";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Settings() {
-  const session = await Auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session) {
     redirect("/");
   }
 
-  const allowMagicLink = session.user.allowMagicLink;
-  const magicLinkEnabled = session.user.useMagicLink;
-  const hasPassword = session.user.hash;
-  const accounts = session.user.accounts;
-  const emailVerified = session.user.emailVerified != null;
+  const userSettingsInfo = await db
+    .select({
+      id: user.id,
+      emailVerified: user.emailVerified,
+      usePassword: account.password,
+      accounts: sql<string[]>`
+          COALESCE(array_agg(${account.providerId}) FILTER (WHERE ${account.providerId} IS NOT NULL), ARRAY[]::TEXT[])`,
+      allowMagicLink: user.allowMagicLink,
+      useMagicLink: user.useMagicLink,
+    })
+    .from(user)
+    .leftJoin(account, eq(user.id, account.userId))
+    .where(eq(user.id, session.user.id))
+    .groupBy(
+      user.id,
+      user.name,
+      user.image,
+      user.createdAt,
+      user.emailVerified,
+      account.password,
+    );
+
+  const allowMagicLink = userSettingsInfo[0].allowMagicLink;
+  const magicLinkEnabled = userSettingsInfo[0].useMagicLink;
+  const usePassword = userSettingsInfo[0].usePassword !== null;
+  const accounts = userSettingsInfo[0].accounts;
+  const emailVerified = userSettingsInfo[0].emailVerified;
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-5">
@@ -25,7 +55,7 @@ export default async function Settings() {
       <SecuritySettings
         MagicLinkEnable={magicLinkEnabled}
         MagicLinkAllow={allowMagicLink}
-        UsePassword={hasPassword}
+        UsePassword={usePassword}
         Accounts={accounts}
         EmailVerified={emailVerified}
       />

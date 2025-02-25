@@ -1,7 +1,5 @@
 "use client";
 
-import { RegisterAction } from "@/actions/auth";
-import { navigate } from "@/actions/navigate";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
 import { FormError, FormSuccess } from "@/components/form-message";
@@ -16,12 +14,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { siteConfig } from "@/config/site";
+import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import { RegisterSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -32,7 +31,7 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ className }: SignUpFormProps) {
-  const search = useSearchParams();
+  const router = useRouter();
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -41,7 +40,21 @@ export function SignUpForm({ className }: SignUpFormProps) {
     mutate: server_RegisterAction,
     isPending: server_RegisterActionIsPending,
   } = useMutation({
-    mutationFn: RegisterAction,
+    mutationFn: async (values: z.infer<typeof RegisterSchema>) => {
+      const { error } = await auth.signUp.email({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+      });
+
+      // FIXME: Fix thee error message
+      // TODO: Redirect is not working
+      if (error) {
+        return { success: false, error: error.message as string };
+      } else {
+        return { success: true, error: "An unexpected error occurred" };
+      }
+    },
     onMutate: () => {
       setSuccess("");
       setError("");
@@ -51,6 +64,8 @@ export function SignUpForm({ className }: SignUpFormProps) {
         setError(data.error);
       } else {
         setSuccess("Registration successful");
+
+        router.push("/auth/sign-in");
       }
     },
     onError: () => {
@@ -76,19 +91,6 @@ export function SignUpForm({ className }: SignUpFormProps) {
   };
 
   const { setFocus } = form;
-
-  // Redirect to the callbackUrl or sign in page after successful registration
-  useEffect(() => {
-    const performRedirect = async () => {
-      if (success) {
-        const callbackUrl = search.get("callbackUrl");
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await navigate(callbackUrl || "/auth/sign-in");
-      }
-    };
-
-    performRedirect();
-  }, [success]);
 
   // Focus password field when an error is set
   useEffect(() => {
@@ -157,7 +159,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;"
+                        placeholder="password"
                         {...field}
                         type={passwordVisible ? "text" : "password"}
                         disabled={server_RegisterActionIsPending}

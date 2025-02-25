@@ -14,16 +14,18 @@ import {
   Text,
 } from "@react-email/components";
 
-interface MagicLinkEmailProps {
-  magicLink: string;
+interface VerifyEmailEmailProps {
+  verifyLink: string;
 }
 
 // TODO: Fix background, text colors, and button
-export default function MagicLinkEmail({ magicLink }: MagicLinkEmailProps) {
+export default function VerifyEmailEmail({
+  verifyLink,
+}: VerifyEmailEmailProps) {
   // Calculate time remaining
-  const remainingMinutes = env.MAGIC_LINK_EXPIRES_IN_SECONDS / 60;
-  const remainingHours = env.MAGIC_LINK_EXPIRES_IN_SECONDS / 3600;
-  const remainingDays = env.MAGIC_LINK_EXPIRES_IN_SECONDS / 86400;
+  const remainingMinutes = env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS / 60;
+  const remainingHours = env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS / 3600;
+  const remainingDays = env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS / 86400;
 
   // Determine the correct time unit and text
   let timeText = "";
@@ -52,31 +54,33 @@ export default function MagicLinkEmail({ magicLink }: MagicLinkEmailProps) {
 
             <Section className="rounded-[var(--radius)] p-6 text-left">
               <Text className="mb-4 text-2xl font-bold">
-                Your one-time login link is ready!
+                Verify your email address for {siteConfig.name}
               </Text>
               <Text className="mb-5 text-base">
-                Click the button below within the next {timeText} to log into
-                your account.
+                Click the button below within the next {timeText} to verify your
+                email.
               </Text>
               <Button
-                href={magicLink}
+                href={verifyLink}
                 className="rounded-md bg-primary px-6 py-3 text-lg text-primary"
               >
-                Log in to {siteConfig.name}
+                Verify email
               </Button>
               <Text className="mt-5 text-base">
                 Or copy this link:
                 <br />
                 <Link
-                  href={magicLink}
+                  href={verifyLink}
                   className="text-accent-foreground underline"
                 >
                   {/*FIXME: Fix the wrap*/}
-                  {magicLink}
+                  {verifyLink}
                 </Link>
               </Text>
               <Text className="mt-5 text-sm">
-                If you did not request this email, you can safely ignore it.
+                {/*TODO: Implement this*/}
+                If you did not validate your email within the 7 days, your
+                account will be deleted.
               </Text>
             </Section>
 

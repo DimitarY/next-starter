@@ -1,7 +1,6 @@
 "use client";
 
-import { LoginAction, MagicLinkAction } from "@/actions/auth";
-import { navigate } from "@/actions/navigate";
+import { MagicLinkAction } from "@/actions/auth";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
 import { FormError, FormSuccess } from "@/components/form-message";
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { siteConfig } from "@/config/site";
+import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import { LoginSchema, MagicLinkSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,6 +54,11 @@ function MagicLinkForm({
           // Call the function to show the CredentialsForm and pass the email
           onShowCredentials(form.getValues().email);
         } else {
+          const { data, error } = await auth.signIn.magicLink({
+            email: form.getValues().email,
+            callbackURL: "/profile", //redirect after successful login (optional)
+          });
+          console.log(data, error);
           setSuccess("Magic link has been sent");
         }
       }
@@ -124,22 +129,46 @@ function MagicLinkForm({
   );
 }
 
-function CredentialsForm({ email }: { email?: string }) {
+function CredentialsForm({
+  email,
+  onBack,
+}: {
+  email?: string;
+  onBack: () => void;
+}) {
   const search = useSearchParams();
-  const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const { mutate: server_LoginAction, isPending: server_LoginActionIsPending } =
     useMutation({
-      mutationFn: LoginAction,
+      mutationFn: async (values: z.infer<typeof LoginSchema>) => {
+        const callbackUrl = search.get("callbackUrl");
+
+        const { error } = await auth.signIn.email({
+          email: values.email,
+          password: values.password,
+          callbackURL: callbackUrl || "/",
+        });
+
+        if (error) {
+          if (error.status === 401) {
+            return { success: false, error: "Invalid email or password" };
+          } else if (error.status === 403) {
+            return { success: false, error: "Email not verified" };
+          } else {
+            console.error("Error:", error);
+            return { success: false, error: "An unexpected error occurred" };
+          }
+        } else {
+          return { success: true, error: "" };
+        }
+      },
       onMutate: () => {
         setError("");
       },
       onSuccess: async (data) => {
         if (!data.success) {
           setError(data.error);
-        } else {
-          setSuccess(true);
         }
       },
       onError: () => {
@@ -164,18 +193,6 @@ function CredentialsForm({ email }: { email?: string }) {
 
   const { setFocus } = form;
 
-  // Redirect to the callbackUrl or the home page after successful login
-  useEffect(() => {
-    const performRedirect = async () => {
-      if (success) {
-        const callbackUrl = search.get("callbackUrl");
-        await navigate(callbackUrl || "/");
-      }
-    };
-
-    performRedirect();
-  }, [success]);
-
   // Focus password field when email is provided
   useEffect(() => {
     if (email) {
@@ -194,24 +211,26 @@ function CredentialsForm({ email }: { email?: string }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="you@example.com"
-                    {...field}
-                    type="email"
-                    disabled={server_LoginActionIsPending}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!!email || (
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="you@example.com"
+                      {...field}
+                      type="email"
+                      disabled={server_LoginActionIsPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           <FormField
             control={form.control}
             name="password"
@@ -220,7 +239,7 @@ function CredentialsForm({ email }: { email?: string }) {
                 <FormLabel>Password</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;"
+                    placeholder="password"
                     {...field}
                     type="password"
                     disabled={server_LoginActionIsPending}
@@ -238,6 +257,10 @@ function CredentialsForm({ email }: { email?: string }) {
             disabled={server_LoginActionIsPending}
           >
             Login
+          </Button>
+          {/*TODO: Update style*/}
+          <Button variant="secondary" className="w-full" onClick={onBack}>
+            Back
           </Button>
         </div>
       </form>
@@ -268,10 +291,13 @@ export function SignInForm({ className }: SignInFormProps) {
         or
       </div>
       {credentialLogin ? (
-        <CredentialsForm email={email} />
+        <CredentialsForm
+          email={email}
+          onBack={() => setCredentialsLogin(false)}
+        />
       ) : (
         <MagicLinkForm onShowCredentials={handleShowCredentials} />
-      )}{" "}
+      )}
       <div className="mt-1 gap-1 text-center text-sm font-medium">
         <div>
           <span>Don&#39;t have an account? </span>

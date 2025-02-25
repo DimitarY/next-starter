@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { GeneralSettings_Profile } from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { type User } from "next-auth";
+import { User } from "better-auth/types";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

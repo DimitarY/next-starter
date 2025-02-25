@@ -11,14 +11,21 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     RESEND_API_KEY: z.string(),
     RESEND_DOMAIN: z.string(),
-    CUID_FINGERPRINT: z.string(),
-    AUTH_SECRET: z.string(),
-    AUTH_URL: z.string().url(),
-    AUTH_GOOGLE_ID: z.string(),
-    AUTH_GOOGLE_SECRET: z.string(),
-    AUTH_GITHUB_ID: z.string(),
-    AUTH_GITHUB_SECRET: z.string(),
+    BETTER_AUTH_SECRET: z.string(),
+    BETTER_AUTH_URL: z.string().url(),
+    BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
+    BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+    BETTER_AUTH_GITHUB_CLIENT_ID: z.string(),
+    BETTER_AUTH_GITHUB_CLIENT_SECRET: z.string(),
     UPLOADTHING_TOKEN: z.string(),
+    MAGIC_LINK_EXPIRES_IN_SECONDS: z
+      .string()
+      .default((60 * 5).toString())
+      .transform((val) => Number(val)),
+    EMAIL_VERIFICATION_EXPIRES_IN_SECONDS: z
+      .string()
+      .default((3600).toString())
+      .transform((val) => Number(val)),
   },
   client: {
     NEXT_PUBLIC_BASE_URL: z.string().url(),

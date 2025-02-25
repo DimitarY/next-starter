@@ -1,8 +1,8 @@
-import { auth } from "@/auth";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
-
 import { user } from "@/db/schema/user";
+import { auth } from "@/lib/auth";
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import type { FileRouter } from "uploadthing/next";
 import { createUploadthing } from "uploadthing/next";
 import { UploadThingError, UTApi } from "uploadthing/server";
@@ -27,12 +27,15 @@ export const uploadRouter = {
     },
   })
     .middleware(async () => {
-      const user = (await auth())?.user;
-      if (!user) throw new UploadThingError("Unauthorized");
+      const session = await auth.api.getSession({
+        headers: await headers(),
+      });
 
-      const currentImageKey = user.image?.split("/f/")[1];
+      if (!session) throw new UploadThingError("Unauthorized");
 
-      return { userId: user.id as string, currentImageKey };
+      const currentImageKey = session.user.image?.split("/f/")[1];
+
+      return { userId: session.user.id, currentImageKey };
     })
     .onUploadComplete(async ({ file, metadata }) => {
       /**

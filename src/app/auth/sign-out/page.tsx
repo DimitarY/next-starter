@@ -1,4 +1,3 @@
-import { signOut } from "@/auth";
 import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,28 +9,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import auth from "@/lib/auth";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Signout() {
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session) {
     redirect("/auth/sign-in");
   }
-  const userName = session.user.name as string;
-  const userEmail = session.user.email as string;
-  const profileImage = session.user?.image as string;
+
+  const userName = session.user.name;
+  const userEmail = session.user.email;
+  const profileImage = session.user.image || "";
 
   // FIXME: Vertical centering is broken
+  async function handleSubmit() {
+    "use server";
+    await auth.api.signOut({
+      headers: await headers(),
+    });
+    redirect("/auth/sign-in");
+  }
+
   return (
     <div className="flex flex-grow items-center justify-center px-4">
-      <form
-        action={async () => {
-          "use server";
-          await signOut().then(() => redirect("/"));
-        }}
-      >
+      <form action={handleSubmit}>
         <Card className="w-[350px]">
           <CardHeader>
             <div className="flex items-center space-x-4">

@@ -1,6 +1,9 @@
 import ProfileInfo from "@/components/profile/profile-info";
-import { GetUserById } from "@/db/querys";
-import Auth from "@/lib/auth";
+import { db } from "@/db";
+import { user } from "@/db/schema/user";
+import { auth } from "@/lib/auth";
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 type Props = {
@@ -8,26 +11,39 @@ type Props = {
 };
 
 export default async function ProfileView({ params }: Props) {
-  const session = await Auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
+  // TODO: Update this to work by username when it is implemented
   const resolvedParams = await params;
 
   if (session && session.user.id === resolvedParams.id) {
     redirect("/profile");
   }
 
-  const user = await GetUserById(resolvedParams.id);
+  const userObjArray = await db // Changed to userObjArray
+    .select({
+      id: user.id,
+      name: user.name,
+      image: user.image,
+      joinedAt: user.createdAt,
+    })
+    .from(user)
+    .where(eq(user.id, resolvedParams.id));
 
-  if (!user) {
+  if (userObjArray.length === 0) {
     notFound();
   }
+
+  const userObj = userObjArray[0];
 
   return (
     <ProfileInfo
       className="mx-auto max-w-4xl"
-      name={user.name as string}
-      image={user.image}
-      joinedAt={user.joinedAt}
+      name={userObj.name}
+      image={userObj.image}
+      joinedAt={userObj.joinedAt}
     />
   );
 }

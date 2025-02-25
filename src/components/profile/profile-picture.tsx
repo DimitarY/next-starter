@@ -1,6 +1,9 @@
 "use client";
 
-import { RemoveUserImageAction, UpdateUserImageAction } from "@/actions/auth";
+import {
+  RemoveUserImageAction,
+  UpdateUserImageAction,
+} from "@/actions/profile";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,8 +18,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useUploadThing } from "@/uploadthing/client";
 import { invariant } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
+import { User } from "better-auth/types";
 import { ImageIcon, Loader2, XIcon } from "lucide-react";
-import type { User } from "next-auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -61,7 +64,8 @@ export function ProfilePictureCard(props: { user: User }) {
         setOutput(null);
         router.refresh();
       },
-      onUploadError: () => {
+      onUploadError: (error) => {
+        console.error("Upload error:", error);
         toast({
           title: "Failed to upload profile picture",
           description: "Please try again.",

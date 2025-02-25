@@ -1,57 +1,44 @@
 import MagicLinkEmail from "@/components/emails/magic-link";
+import VerifyEmailEmail from "@/components/emails/verify-email";
 import { siteConfig } from "@/config/site";
 import { env } from "@/env";
-import { render } from "@react-email/render";
+import { Resend } from "resend";
 
-interface Provider {
-  from: string;
-}
-
-interface VerificationParams {
+interface Params {
   identifier: string; // 'to' email address
-  provider: Provider;
   url: string;
 }
 
-export async function sendVerificationRequest(
-  params: VerificationParams,
-): Promise<void> {
-  const { identifier: email, provider, url } = params;
+export async function sendMagicLink({
+  identifier,
+  url,
+}: Params): Promise<void> {
+  const resend = new Resend(env.RESEND_API_KEY);
 
-  // Using API
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: provider.from,
-      to: email,
-      subject: `Sign in to ${siteConfig.name}`,
-      html: await render(MagicLinkEmail({ magicLink: url }), { pretty: true }),
-      text: await render(MagicLinkEmail({ magicLink: url }), {
-        plainText: true,
-      }),
-    }),
+  const { error } = await resend.emails.send({
+    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+    to: identifier,
+    subject: `Sign in to ${siteConfig.name}`,
+    react: MagicLinkEmail({ magicLink: url }),
   });
 
   // TODO: Handle error
-  if (!res.ok) {
-    console.error("Resend error: " + JSON.stringify(await res.json()));
-  }
+  console.log("error", error);
+}
 
-  // Using resend package
-  // Can't be used with container
-  // auth.config is constructed at build time
-  // but env.RESEND_API_KEY is provided at run time
-  // const { error } = await resend.emails.send({
-  //   from: provider.from,
-  //   to: email,
-  //   subject: `Sign in to ${siteConfig.name}`,
-  //   react: MagicLinkEmail({ magicLink: url }),
-  // });
-  //
-  // // TODO: Handle error
-  // console.log("error", error);
+export async function sendVerificationRequest({
+  identifier,
+  url,
+}: Params): Promise<void> {
+  const resend = new Resend(env.RESEND_API_KEY);
+
+  const { error } = await resend.emails.send({
+    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+    to: identifier,
+    subject: `Verify your email address`,
+    react: VerifyEmailEmail({ verifyLink: url }),
+  });
+
+  // TODO: Handle error
+  console.log("error", error);
 }

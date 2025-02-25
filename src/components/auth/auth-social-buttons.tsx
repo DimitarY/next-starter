@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
-import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
@@ -21,10 +21,11 @@ export function AuthSocialButtons({
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
 
-  const onClick = (provider: "google" | "github") => {
-    signIn(provider, {
-      redirectTo: callbackUrl || window.location.href,
-    }).then();
+  const onClick = async (provider: "google" | "github") => {
+    await auth.signIn.social({
+      provider: provider,
+      callbackURL: callbackUrl || "/",
+    });
   };
 
   return (

@@ -1,6 +1,5 @@
 "use client";
 
-import { DisconnectAccountAction } from "@/actions/auth";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import {
   SecuritySettings_Password,
@@ -30,8 +30,6 @@ import {
 } from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -54,22 +52,33 @@ export function ConnectSocialButtons({
 }: ConnectSocialButtonsProps) {
   const [error, setError] = useState<string | undefined>("");
 
-  const router = useRouter();
+  // FIXME
+  // const router = useRouter();
 
   const {
     mutate: server_DisconnectAccountAction,
     isPending: server_DisconnectAccountActionIsPending,
   } = useMutation({
-    mutationFn: DisconnectAccountAction,
+    mutationFn: async (provider: string) => {
+      console.log(provider);
+      // Simulate API call (replace with actual API request logic)
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ success: true });
+        }, 1000);
+      });
+    },
     onMutate: () => {
       setError("");
     },
-    onSuccess: async (data) => {
-      if (!data.success) {
-        setError(data.error);
-      } else {
-        router.refresh();
-      }
+    // onSuccess: async (data) => {
+    onSuccess: async () => {
+      // FIXME
+      // if (!data.success) {
+      //   setError(data.error);
+      // } else {
+      //   router.refresh();
+      // }
     },
     onError: () => {
       setError("An unexpected error occurred. Please try again.");
@@ -87,9 +96,10 @@ export function ConnectSocialButtons({
         );
       }
     } else {
-      signIn(provider, {
-        redirectTo: window.location.href, // FIXME: redirect is not working
-      }).then();
+      auth.signIn.social({
+        provider: provider,
+        callbackURL: window.location.href,
+      });
     }
   };
 

@@ -1,8 +1,8 @@
 import { Icons } from "@/components/icons";
-import { Button } from "@/components/ui/button"; // Adjust the path as necessary
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn, formatDate } from "@/lib/utils";
-import { User } from "next-auth";
+import { User } from "better-auth/types";
 import Image from "next/image";
 import Link from "next/link";
 

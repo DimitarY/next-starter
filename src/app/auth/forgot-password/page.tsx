@@ -1,9 +1,12 @@
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import Auth from "@/lib/auth";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function ForgotPassword() {
-  const session = await Auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (session) {
     redirect("/");

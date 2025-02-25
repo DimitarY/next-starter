@@ -1,12 +1,11 @@
 import CookieConsent from "@/components/cookie-consent";
 import Footer from "@/components/footer";
-import MainNav from "@/components/nav/main-nav";
+import { MainNav } from "@/components/nav/main-nav";
 import { ReactQueryClientProvider } from "@/components/react-query-client-provider";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { siteConfig } from "@/config/site";
-import Auth from "@/lib/auth";
 import "@/styles/globals.css";
 import { uploadRouter } from "@/uploadthing/server";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
@@ -24,8 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await Auth();
-
   return (
     <html lang="en">
       <body className="flex min-h-dvh flex-col">
@@ -37,7 +34,7 @@ export default async function RootLayout({
         >
           <NextSSRPlugin routerConfig={extractRouterConfig(uploadRouter)} />
           <header className="flex w-full shrink-0 items-center px-4 py-4 md:px-6">
-            <MainNav items={siteConfig.mainNav} session={session} />
+            <MainNav items={siteConfig.mainNav} />
           </header>
           <ReactQueryClientProvider>
             <main className="flex-1 overflow-hidden">{children}</main>

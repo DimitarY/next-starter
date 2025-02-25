@@ -1,9 +1,12 @@
 import ProfileInfo from "@/components/profile/profile-info";
-import Auth from "@/lib/auth";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Settings() {
-  const session = await Auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session) {
     redirect("/");
@@ -12,9 +15,9 @@ export default async function Settings() {
   return (
     <ProfileInfo
       className="mx-auto max-w-4xl"
-      name={session.user.name as string}
+      name={session.user.name}
       image={session.user.image}
-      joinedAt={session.user.joinedAt}
+      joinedAt={session.user.createdAt}
       selfView={true}
     />
   );

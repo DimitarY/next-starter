@@ -14,26 +14,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SheetClose } from "@/components/ui/sheet";
-import { UserRole } from "@/db/schema/enumerated";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { Session } from "next-auth";
+import { User } from "@/lib/auth";
+import { UserRoleClient } from "@/lib/client/auth";
+import { Session } from "better-auth";
 import Link from "next/link";
 
-export function AccountNav({ session }: { session: Session }) {
+interface userSession {
+  session: Session;
+  user: User;
+}
+
+export function AccountNav({ session }: { session: userSession }) {
   const isMobile = useIsMobile();
 
   if (session) {
-    const userName = session.user.name as string;
-    const profileImage = session.user?.image as string;
-
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
             <Avatar>
-              <AvatarImage src={profileImage} alt={userName} />
+              <AvatarImage
+                src={session.user.image || ""}
+                alt={session.user.name}
+              />
               <AvatarFallback>
-                {userName
+                {session.user.name
                   .split(" ")
                   .map((n) => n[0])
                   .join("")
@@ -77,7 +83,7 @@ export function AccountNav({ session }: { session: Session }) {
               )}
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          {session.user?.role === UserRole.Administrator && (
+          {session.user.role === UserRoleClient.admin && (
             <DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -92,26 +98,6 @@ export function AccountNav({ session }: { session: Session }) {
                   <Link href="/dashboard" className="flex gap-2">
                     <Icons.dashboard />
                     <span>Admin panel</span>
-                  </Link>
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          )}
-          {session.user?.role === UserRole.Moderator && (
-            <DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                {isMobile ? (
-                  <SheetClose asChild>
-                    <Link href="/dashboard" className="flex gap-2">
-                      <Icons.dashboard />
-                      <span>Control panel</span>
-                    </Link>
-                  </SheetClose>
-                ) : (
-                  <Link href="/dashboard" className="flex gap-2">
-                    <Icons.dashboard />
-                    <span>Control panel</span>
                   </Link>
                 )}
               </DropdownMenuItem>
