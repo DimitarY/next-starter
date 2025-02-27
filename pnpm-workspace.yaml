@@ -1,6 +1,0 @@
-packages:
-  - 'src/**'
-  - '.'
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
