@@ -99,18 +99,7 @@ Start container
   -p 3000:3000 \
   --restart unless-stopped \
   --name next-starter-container \
-  -e NEXT_PUBLIC_BASE_URL=$(grep NEXT_PUBLIC_BASE_URL .env.container | cut -d '=' -f2) \
-  -e DATABASE_URL=$(grep DATABASE_URL .env.container | cut -d '=' -f2) \
-  -e RESEND_API_KEY=$(grep RESEND_API_KEY .env.container | cut -d '=' -f2) \
-  -e RESEND_DOMAIN=$(grep RESEND_DOMAIN .env.container | cut -d '=' -f2) \
-  -e BETTER_AUTH_URL=$(grep BETTER_AUTH_URL .env.container | cut -d '=' -f2) \
-  -e BETTER_AUTH_SECRET=$(grep BETTER_AUTH_SECRET .env.container | cut -d '=' -f2) \
-  -e BETTER_AUTH_GOOGLE_CLIENT_ID=$(grep BETTER_AUTH_GOOGLE_CLIENT_ID .env.container | cut -d '=' -f2) \
-  -e BETTER_AUTH_GOOGLE_CLIENT_SECRET=$(grep BETTER_AUTH_GOOGLE_CLIENT_SECRET .env.container | cut -d '=' -f2) \
-  -e BETTER_AUTH_GITHUB_CLIENT_ID=$(grep BETTER_AUTH_GITHUB_CLIENT_ID .env.container | cut -d '=' -f2) \
-  -e BETTER_AUTH_GITHUB_CLIENT_SECRET=$(grep BETTER_AUTH_GITHUB_CLIENT_SECRET .env.container | cut -d '=' -f2) \
-  -e UPLOADTHING_TOKEN=$(grep UPLOADTHING_TOKEN .env.container | cut -d '=' -f2) \
-  -e UPLOADTHING_CALLBACK_URL=$(grep UPLOADTHING_CALLBACK_URL .env.container | cut -d '=' -f2) \
+  --env-file .env.container \
   ghcr.io/dimitary/next-starter
 ```
 
