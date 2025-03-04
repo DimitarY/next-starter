@@ -30,6 +30,7 @@ import {
 } from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -42,6 +43,7 @@ interface ConnectSocialButtonsProps {
   connectedAccounts: string[];
   usePassword: boolean;
   emailVerified: boolean;
+  magicLinkEnabled: boolean;
 }
 
 export function ConnectSocialButtons({
@@ -49,36 +51,37 @@ export function ConnectSocialButtons({
   connectedAccounts,
   usePassword,
   emailVerified,
+  magicLinkEnabled,
 }: ConnectSocialButtonsProps) {
   const [error, setError] = useState<string | undefined>("");
 
-  // FIXME
-  // const router = useRouter();
+  const router = useRouter();
 
   const {
     mutate: server_DisconnectAccountAction,
     isPending: server_DisconnectAccountActionIsPending,
   } = useMutation({
     mutationFn: async (provider: string) => {
-      console.log(provider);
-      // Simulate API call (replace with actual API request logic)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ success: true });
-        }, 1000);
+      const { error } = await auth.unlinkAccount({
+        providerId: provider,
       });
+
+      if (error) {
+        return { success: false, error: "An unexpected error occurred" };
+      } else {
+        return { success: true, error: "" };
+      }
     },
     onMutate: () => {
       setError("");
     },
     // onSuccess: async (data) => {
-    onSuccess: async () => {
-      // FIXME
-      // if (!data.success) {
-      //   setError(data.error);
-      // } else {
-      //   router.refresh();
-      // }
+    onSuccess: async (data) => {
+      if (!data.success) {
+        setError(data.error);
+      } else {
+        router.refresh();
+      }
     },
     onError: () => {
       setError("An unexpected error occurred. Please try again.");
@@ -87,16 +90,21 @@ export function ConnectSocialButtons({
 
   const onClick = (provider: "google" | "github") => {
     setError("");
+
     if (connectedAccounts.includes(provider)) {
-      if (connectedAccounts.length > 1 || emailVerified || usePassword) {
+      if (
+        connectedAccounts.length > 1 ||
+        (emailVerified && magicLinkEnabled) ||
+        usePassword
+      ) {
         server_DisconnectAccountAction(provider);
       } else {
         setError(
-          "Your can not disconnect from every account without verified email!",
+          "Your can not disconnect from every account without using magic link or password!",
         );
       }
     } else {
-      auth.signIn.social({
+      auth.linkSocial({
         provider: provider,
         callbackURL: window.location.href,
       });
@@ -500,6 +508,7 @@ export function SecuritySettings({
             connectedAccounts={Accounts}
             emailVerified={EmailVerified}
             usePassword={UsePassword}
+            magicLinkEnabled={MagicLinkEnable}
           />
           <div className="flex items-center justify-between">
             <div>

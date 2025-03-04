@@ -24,9 +24,9 @@ export default async function Settings() {
     .select({
       id: user.id,
       emailVerified: user.emailVerified,
-      usePassword: account.password,
+      usePassword: sql<boolean>`bool_or(${account.password} IS NOT NULL)`,
       accounts: sql<string[]>`
-          COALESCE(array_agg(${account.providerId}) FILTER (WHERE ${account.providerId} IS NOT NULL), ARRAY[]::TEXT[])`,
+          COALESCE(array_agg(DISTINCT ${account.providerId}) FILTER (WHERE ${account.providerId} IS NOT NULL), ARRAY[]::TEXT[])`,
       allowMagicLink: user.allowMagicLink,
       useMagicLink: user.useMagicLink,
     })
@@ -39,12 +39,13 @@ export default async function Settings() {
       user.image,
       user.createdAt,
       user.emailVerified,
-      account.password,
+      user.allowMagicLink,
+      user.useMagicLink,
     );
 
   const allowMagicLink = userSettingsInfo[0].allowMagicLink;
   const magicLinkEnabled = userSettingsInfo[0].useMagicLink;
-  const usePassword = userSettingsInfo[0].usePassword !== null;
+  const usePassword = userSettingsInfo[0].usePassword;
   const accounts = userSettingsInfo[0].accounts;
   const emailVerified = userSettingsInfo[0].emailVerified;
 

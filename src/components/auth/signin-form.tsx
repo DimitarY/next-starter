@@ -156,7 +156,6 @@ function CredentialsForm({
           } else if (error.status === 403) {
             return { success: false, error: "Email not verified" };
           } else {
-            console.error("Error:", error);
             return { success: false, error: "An unexpected error occurred" };
           }
         } else {

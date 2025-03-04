@@ -48,6 +48,13 @@ export const auth = betterAuth({
       clientSecret: env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
     },
   },
+  account: {
+    accountLinking: {
+      enabled: true,
+      allowMultipleAccounts: true,
+      allowDifferentEmails: true,
+    },
+  },
   plugins: [
     admin({
       defaultRole: "user",
