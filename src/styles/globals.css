@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -68,7 +68,6 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 }
-
 
 @layer base {
   :root {
