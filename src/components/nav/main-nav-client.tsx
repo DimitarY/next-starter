@@ -70,7 +70,7 @@ export function MainNavClient({ items, session }: MainNavProps) {
                   <Collapsible key={index} className="grid gap-4 py-2">
                     <CollapsibleTrigger className="flex w-full items-center font-semibold [&[data-state=open]>svg]:rotate-90">
                       {item.title}
-                      <Icons.chevronRight className="ml-auto h-5 w-5 transition-all" />
+                      <Icons.chevronRight className="ml-auto size-5 transition-all" />
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="grid gap-2">
@@ -84,11 +84,11 @@ export function MainNavClient({ items, session }: MainNavProps) {
                                 href={subItem.href}
                                 className="group grid h-auto w-full justify-start gap-1"
                               >
-                                <div className="text-sm font-medium leading-none group-hover:underline">
+                                <div className="text-sm leading-none font-medium group-hover:underline">
                                   {subItem.title}
                                 </div>
                                 {subItem.description != undefined && (
-                                  <div className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                  <div className="text-muted-foreground line-clamp-2 text-sm leading-snug">
                                     {subItem.description}
                                   </div>
                                 )}
@@ -138,7 +138,7 @@ export function MainNavClient({ items, session }: MainNavProps) {
                 <NavigationMenuLink key={index} asChild>
                   <Link
                     href={item.href}
-                    className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                    className="group bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-active:bg-accent/50 data-[state=open]:bg-accent/50 inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-hidden disabled:pointer-events-none disabled:opacity-50"
                   >
                     {item.title}
                   </Link>
@@ -152,13 +152,13 @@ export function MainNavClient({ items, session }: MainNavProps) {
                         <NavigationMenuLink key={subIndex} asChild>
                           <Link
                             href={subItem.href}
-                            className="group grid h-auto w-full items-center justify-start gap-1 rounded-md bg-background p-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            className="group bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-active:bg-accent/50 data-[state=open]:bg-accent/50 grid h-auto w-full items-center justify-start gap-1 rounded-md p-4 text-sm font-medium transition-colors focus:outline-hidden disabled:pointer-events-none disabled:opacity-50"
                           >
-                            <div className="text-sm font-medium leading-none group-hover:underline">
+                            <div className="text-sm leading-none font-medium group-hover:underline">
                               {subItem.title}
                             </div>
                             {subItem.description != undefined && (
-                              <div className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              <div className="text-muted-foreground line-clamp-2 text-sm leading-snug">
                                 {subItem.description}
                               </div>
                             )}

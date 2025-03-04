@@ -36,7 +36,7 @@ export function AuthSocialButtons({
         variant="link"
         onClick={() => onClick("google")}
       >
-        <FcGoogle className="h-5 w-5" /> {googleButtonText}
+        <FcGoogle className="size-5" /> {googleButtonText}
       </Button>
       <Button
         size="lg"
@@ -44,7 +44,7 @@ export function AuthSocialButtons({
         variant="link"
         onClick={() => onClick("github")}
       >
-        <VscGithubAlt className="h-5 w-5" /> {githubButtonText}
+        <VscGithubAlt className="size-5" /> {githubButtonText}
       </Button>
     </div>
   );

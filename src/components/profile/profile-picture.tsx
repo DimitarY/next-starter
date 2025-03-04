@@ -141,7 +141,7 @@ export function ProfilePictureCard(props: { user: User }) {
                 priority
                 unoptimized={!!output?.preview} // Disable Next.js image optimization for non-static URLs
               />
-              <Icons.pencil className="pointer-events-none absolute bottom-1 right-1 h-auto w-8 rounded-md bg-black/50 p-1 text-white" />
+              <Icons.pencil className="pointer-events-none absolute right-1 bottom-1 h-auto w-8 rounded-md bg-black/50 p-1 text-white" />
             </div>
           </div>
         )}
@@ -164,7 +164,7 @@ export function ProfilePictureCard(props: { user: User }) {
         </CardContent>
       )}
       <CardFooter className="flex flex-col justify-start gap-2 border-t px-6 py-4 sm:flex-row sm:justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {file
             ? "Zoom and Drag to crop the image."
             : props.user.image
@@ -200,7 +200,7 @@ export function ProfilePictureCard(props: { user: User }) {
               onClick={uploadCroppedImage}
               disabled={isUploading}
             >
-              {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isUploading && <Loader2 className="mr-2 size-4 animate-spin" />}
               Save
             </Button>
           )) ||

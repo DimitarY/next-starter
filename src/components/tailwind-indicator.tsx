@@ -5,7 +5,7 @@ export function TailwindIndicator() {
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex items-center justify-center">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 p-3 font-mono text-xs text-white">
+      <div className="flex size-8 items-center justify-center rounded-full bg-gray-800 p-3 font-mono text-xs text-white">
         {[
           { label: "xs", visible: "block sm:hidden" },
           { label: "sm", visible: "hidden sm:block md:hidden" },

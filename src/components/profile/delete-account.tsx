@@ -90,7 +90,7 @@ export function DeleteAccount() {
               control={form.control}
               name="accept"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       className="border-red-500 data-[state=checked]:border-black data-[state=checked]:bg-red-500 dark:data-[state=checked]:border-white"

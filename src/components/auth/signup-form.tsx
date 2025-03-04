@@ -108,7 +108,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
       <Suspense>
         <AuthSocialButtons />
       </Suspense>
-      <div className="mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400">
+      <div className="mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:grow before:bg-stone-400 after:ml-4 after:block after:h-px after:grow after:bg-stone-400">
         or
       </div>
       <Form {...form}>
@@ -167,12 +167,12 @@ export function SignUpForm({ className }: SignUpFormProps) {
                       <button
                         type="button"
                         onClick={() => setPasswordVisible(!passwordVisible)}
-                        className="absolute right-2 top-2 pr-1 text-gray-500"
+                        className="absolute top-2 right-2 pr-1 text-gray-500"
                       >
                         {passwordVisible ? (
-                          <FaEyeSlash className="h-5 w-5" />
+                          <FaEyeSlash className="size-5" />
                         ) : (
-                          <FaEye className="h-5 w-5" />
+                          <FaEye className="size-5" />
                         )}
                       </button>
                     </div>

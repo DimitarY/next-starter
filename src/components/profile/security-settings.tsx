@@ -126,7 +126,7 @@ export function ConnectSocialButtons({
         onClick={() => onClick("google")}
         disabled={server_DisconnectAccountActionIsPending}
       >
-        <FcGoogle className="h-5 w-5" />{" "}
+        <FcGoogle className="size-5" />{" "}
         {connectedAccounts.includes("google") ? "Disconnect" : "Connect"} with
         Google
       </Button>
@@ -137,7 +137,7 @@ export function ConnectSocialButtons({
         onClick={() => onClick("github")}
         disabled={server_DisconnectAccountActionIsPending}
       >
-        <VscGithubAlt className="h-5 w-5" />
+        <VscGithubAlt className="size-5" />
         {connectedAccounts.includes("github") ? "Disconnect" : "Connect"} with
         Github
       </Button>
@@ -268,12 +268,12 @@ function PasswordUpdateForm() {
                   <button
                     type="button"
                     onClick={() => setPasswordVisible(!passwordVisible)}
-                    className="absolute right-2 top-2 pr-1 text-gray-500"
+                    className="absolute top-2 right-2 pr-1 text-gray-500"
                   >
                     {passwordVisible ? (
-                      <FaEyeSlash className="h-5 w-5" />
+                      <FaEyeSlash className="size-5" />
                     ) : (
-                      <FaEye className="h-5 w-5" />
+                      <FaEye className="size-5" />
                     )}
                   </button>
                 </div>
@@ -513,7 +513,7 @@ export function SecuritySettings({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium">Logout</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Logout from all devices
               </p>
             </div>
@@ -533,7 +533,7 @@ export function SecuritySettings({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-base font-medium">Magic Link Login</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Enable magic link login. Password login will be disabled.
                   </p>
                 </div>
@@ -551,7 +551,7 @@ export function SecuritySettings({
                 </Button>
               </div>
               {isMagicLinkEnabled && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Note: You will no longer be able to log in using your password
                   if this option is enabled.
                 </p>

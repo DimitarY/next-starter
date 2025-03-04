@@ -98,7 +98,7 @@ export default function CookieConsentManagePreferences() {
             <Switch checked disabled />
             <div className="flex flex-col gap-2">
               <label className="font-medium">Strictly necessary cookies</label>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground text-sm">
                 These cookies are necessary for {siteConfig.name} to function.{" "}
                 <Link href="/privacy" className="underline">
                   Learn more
@@ -124,7 +124,7 @@ export default function CookieConsentManagePreferences() {
                     />
                     <div className="flex flex-col gap-2">
                       <label className="font-medium">{name}</label>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-muted-foreground text-sm">
                         {description}{" "}
                         <Link href={learnMoreLink} className="underline">
                           Learn more

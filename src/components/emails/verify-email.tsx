@@ -42,9 +42,9 @@ export default function VerifyEmailEmail({
       <Head />
       <Preview>Sign in to {siteConfig.name}</Preview>
       <Tailwind>
-        <Body className="bg-background font-sans text-foreground">
+        <Body className="bg-background text-foreground font-sans">
           <Container className="mx-auto max-w-[600px]">
-            <Section className="mb-3 flex h-[60px] items-center justify-center rounded-[var(--radius)] bg-card">
+            <Section className="bg-card mb-3 flex h-[60px] items-center justify-center rounded-[var(--radius)]">
               <Img
                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Test-Logo.svg/512px-Test-Logo.svg.png"
                 alt={`${siteConfig.name} logo`}
@@ -62,7 +62,7 @@ export default function VerifyEmailEmail({
               </Text>
               <Button
                 href={verifyLink}
-                className="rounded-md bg-primary px-6 py-3 text-lg text-primary"
+                className="bg-primary text-primary rounded-md px-6 py-3 text-lg"
               >
                 Verify email
               </Button>
@@ -85,7 +85,7 @@ export default function VerifyEmailEmail({
             </Section>
 
             <Section className="mt-8 text-center">
-              <Text className="text-sm text-muted-foreground">
+              <Text className="text-muted-foreground text-sm">
                 © {new Date().getFullYear()} {siteConfig.name}
                 <br />
                 <Link

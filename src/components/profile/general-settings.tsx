@@ -128,7 +128,7 @@ export function GeneralSettings(props: { user: User }) {
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col justify-start gap-2 border-t px-6 py-4 sm:flex-row sm:justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Use this section to customize your account and profile settings.
         </p>
       </CardFooter>

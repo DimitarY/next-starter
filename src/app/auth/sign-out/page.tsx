@@ -36,7 +36,7 @@ export default async function Signout() {
   }
 
   return (
-    <div className="flex flex-grow items-center justify-center px-4">
+    <div className="flex grow items-center justify-center px-4">
       <form action={handleSubmit}>
         <Card className="w-[350px]">
           <CardHeader>
@@ -58,7 +58,7 @@ export default async function Signout() {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Are you sure you want to sign out?
             </p>
           </CardContent>

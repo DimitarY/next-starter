@@ -9,7 +9,7 @@ To run this project, you will need to configure the following environment variab
 ### .env
 
 | Environment Variable Name          | Description                                                              |
-|------------------------------------|--------------------------------------------------------------------------|
+| ---------------------------------- | ------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_BASE_URL`             | The base URL for the application, e.g., `https://localhost:3000`.        |
 | `DATABASE_URL`                     | The connection string for the database.                                  |
 | `RESEND_API_KEY`                   | API key for the Resend service.                                          |
@@ -25,7 +25,7 @@ To run this project, you will need to configure the following environment variab
 ### .env.development
 
 | Environment Variable Name | Description                                                   |
-|---------------------------|---------------------------------------------------------------|
+| ------------------------- | ------------------------------------------------------------- |
 | `NEXT_PUBLIC_BASE_URL`    | Override the `.env` value for development.                    |
 | `BETTER_AUTH_URL`         | Override the `.env` value for development.                    |
 | `LOCAL_DNS_RECORD`        | If using a local DNS record for development, specify it here. |
@@ -33,7 +33,7 @@ To run this project, you will need to configure the following environment variab
 ### .env.production
 
 | Environment Variable Name  | Description                                                                                                                                                  |
-|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_BASE_URL`     | Override the `.env` value for production.                                                                                                                    |
 | `BETTER_AUTH_URL`          | Override the `.env` value for production.                                                                                                                    |
 | `UPLOADTHING_CALLBACK_URL` | The callback URL for UploadThing in production. See [documentation](https://docs.uploadthing.com/faq#my-callback-runs-in-development-but-not-in-production). |
@@ -41,7 +41,7 @@ To run this project, you will need to configure the following environment variab
 ### .env.container
 
 | Environment Variable Name          | Description                                                                                                                                                  |
-|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_BASE_URL`             | The base URL for production build.                                                                                                                           |
 | `DATABASE_URL`                     | The connection string for the database.                                                                                                                      |
 | `RESEND_API_KEY`                   | API key for the Resend service.                                                                                                                              |
@@ -58,7 +58,7 @@ To run this project, you will need to configure the following environment variab
 ### Additional environment variables
 
 | Environment Variable Name               | Description                                            |
-|-----------------------------------------|--------------------------------------------------------|
+| --------------------------------------- | ------------------------------------------------------ |
 | `MAGIC_LINK_EXPIRES_IN_SECONDS`         | Used to change the expires time for Magic Link         |
 | `EMAIL_VERIFICATION_EXPIRES_IN_SECONDS` | Used to change the expires time for Email Verification |
 

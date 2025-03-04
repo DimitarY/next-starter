@@ -61,7 +61,7 @@ function AuthError({ className }: AuthErrorMessageProps) {
           className,
         )}
       >
-        <div className="flex w-full max-w-sm flex-col items-center justify-center rounded-lg border border-gray-200 bg-destructive p-6 text-center text-destructive">
+        <div className="bg-destructive text-destructive flex w-full max-w-sm flex-col items-center justify-center rounded-lg border border-gray-200 p-6 text-center">
           <h5 className="mb-2 flex flex-row items-center justify-center gap-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
             Oops! Something went wrong
           </h5>
