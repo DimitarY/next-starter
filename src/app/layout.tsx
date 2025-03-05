@@ -4,7 +4,7 @@ import { MainNav } from "@/components/nav/main-nav";
 import { ReactQueryClientProvider } from "@/components/react-query-client-provider";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
 import "@/styles/globals.css";
 import { uploadRouter } from "@/uploadthing/server";

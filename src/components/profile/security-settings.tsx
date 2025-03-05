@@ -21,7 +21,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import {
@@ -36,6 +35,7 @@ import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
+import { toast } from "sonner";
 import { z } from "zod";
 
 interface ConnectSocialButtonsProps {
@@ -449,16 +449,13 @@ export function SecuritySettings({
       });
     },
     onSuccess: () => {
-      toast({
-        title: "Success!",
+      toast("Success!", {
         description: "Successfully logged out from all devices.",
       });
     },
     onError: () => {
-      toast({
-        title: "Error!",
+      toast("Error!", {
         description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
       });
     },
   });
@@ -477,18 +474,15 @@ export function SecuritySettings({
     },
     onSuccess: () => {
       setIsMagicLinkEnabled(!isMagicLinkEnabled);
-      toast({
-        title: "Success!",
+      toast("Success!", {
         description: isMagicLinkEnabled
           ? "Magic link login enabled. Password login is now disabled."
           : "Magic link login disabled. Password login is re-enabled.",
       });
     },
     onError: () => {
-      toast({
-        title: "Error!",
+      toast("Error!", {
         description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
       });
     },
   });

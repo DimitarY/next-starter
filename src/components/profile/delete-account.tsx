@@ -12,12 +12,12 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { toast } from "@/hooks/use-toast";
 import { DeleteProfile } from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 export function DeleteAccount() {
@@ -56,8 +56,7 @@ export function DeleteAccount() {
       setError("");
     },
     onSuccess: () => {
-      toast({
-        title: "Success!",
+      toast("Success!", {
         description: "Successfully logged out from all devices.",
       });
     },

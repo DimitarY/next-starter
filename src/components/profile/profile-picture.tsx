@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { useUploadThing } from "@/uploadthing/client";
 import { invariant } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -25,13 +24,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Area, Point } from "react-easy-crop";
 import Cropper from "react-easy-crop";
+import { toast } from "sonner";
 import { generateMimeTypes } from "uploadthing/client";
 import type { ExpandedRouteConfig } from "uploadthing/types";
 
 type FileWithPreview = File & { preview: string };
 
 export function ProfilePictureCard(props: { user: User }) {
-  const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<FileWithPreview | null>(null);
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
@@ -51,10 +50,8 @@ export function ProfilePictureCard(props: { user: User }) {
         await Promise.all([
           UpdateUserImageAction(uploadedFile.url),
           waitForImageToLoad(uploadedFile.url).catch((error) =>
-            toast({
-              title: "Failed to upload profile picture",
+            toast("Failed to upload profile picture", {
               description: error.message,
-              variant: "destructive",
             }),
           ),
         ]);
@@ -66,10 +63,8 @@ export function ProfilePictureCard(props: { user: User }) {
       },
       onUploadError: (error) => {
         console.error("Upload error:", error);
-        toast({
-          title: "Failed to upload profile picture",
+        toast("Failed to upload profile picture", {
           description: "Please try again.",
-          variant: "destructive",
         });
       },
     },

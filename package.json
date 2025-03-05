@@ -58,6 +58,7 @@
     "react-icons": "^5.5.0",
     "react-image-crop": "^11.0.7",
     "resend": "^4.1.2",
+    "sonner": "^2.0.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^7.5.2",
