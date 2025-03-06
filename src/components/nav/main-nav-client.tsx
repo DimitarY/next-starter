@@ -21,8 +21,11 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetFooter,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { User } from "@/lib/auth";
 import { MainNavItem } from "@/types";
 import { Session } from "better-auth";
@@ -38,21 +41,28 @@ interface MainNavProps {
   session: userSession | null;
 }
 
-export function MainNavClient({ items, session }: MainNavProps) {
+function MobileNav({ items, session }: MainNavProps) {
   return (
     <>
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="lg:hidden">
+          <Button
+            variant="outline"
+            size="icon"
+            className="cursor-pointer lg:hidden"
+          >
             <Icons.menu />
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left">
+        <SheetContent side="left" className="p-4">
+          <SheetTitle className="sr-only">Mobile navigation</SheetTitle>
           <SheetClose asChild>
-            <Link href="/">
-              <Icons.logo />
-            </Link>
+            <Button asChild variant="ghost" size="icon">
+              <Link href="/">
+                <Icons.logo />
+              </Link>
+            </Button>
           </SheetClose>
           {items.length ? (
             <div className="grid gap-2 py-6">
@@ -103,25 +113,30 @@ export function MainNavClient({ items, session }: MainNavProps) {
               )}
             </div>
           ) : null}
-          <div className="mt-4 flex gap-2">
-            <ModeToggle />
+          <SheetFooter className="flex flex-row flex-wrap gap-2">
             {session ? (
-              <AccountNav session={session} />
+              <>
+                <AccountNav session={session} />
+                <ModeToggle />
+              </>
             ) : (
               <>
-                <SheetClose asChild>
-                  <Button asChild variant="outline">
-                    <Link href="/auth/sign-in">Sign In</Link>
-                  </Button>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Button asChild>
-                    <Link href="/auth/sign-up">Sign Up</Link>
-                  </Button>
-                </SheetClose>
+                <ModeToggle />
+                <div>
+                  <SheetClose asChild>
+                    <Button asChild variant="outline">
+                      <Link href="/auth/sign-in">Sign In</Link>
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button asChild>
+                      <Link href="/auth/sign-up">Sign Up</Link>
+                    </Button>
+                  </SheetClose>
+                </div>
               </>
             )}
-          </div>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
       <div className="w-[150px]">
@@ -130,6 +145,13 @@ export function MainNavClient({ items, session }: MainNavProps) {
           <span className="sr-only">Acme Inc</span>
         </Link>
       </div>
+    </>
+  );
+}
+
+function DesktopNav({ items, session }: MainNavProps) {
+  return (
+    <>
       <NavigationMenu className="hidden lg:flex">
         {items.length ? (
           <NavigationMenuList>
@@ -188,6 +210,20 @@ export function MainNavClient({ items, session }: MainNavProps) {
           </>
         )}
       </div>
+    </>
+  );
+}
+
+export function MainNavClient(props: MainNavProps) {
+  const isMobile = useIsMobile();
+
+  return (
+    <>
+      {isMobile ? (
+        <MobileNav items={props.items} session={props.session} />
+      ) : (
+        <DesktopNav items={props.items} session={props.session} />
+      )}
     </>
   );
 }

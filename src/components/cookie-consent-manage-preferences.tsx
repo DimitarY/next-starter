@@ -86,7 +86,7 @@ export default function CookieConsentManagePreferences() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
-        <button className="text-blue-500 underline dark:text-blue-400">
+        <button className="cursor-pointer text-blue-500 underline dark:text-blue-400">
           Manage preferences
         </button>
       </DialogTrigger>

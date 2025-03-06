@@ -32,7 +32,7 @@ export function AccountNav({ session }: { session: userSession }) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="cursor-pointer">
             <Avatar>
               <AvatarImage
                 src={session.user.image || ""}
@@ -52,7 +52,7 @@ export function AccountNav({ session }: { session: userSession }) {
           <DropdownMenuLabel>Welcome {session.user.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               {isMobile ? (
                 <SheetClose asChild>
                   <Link href="/profile" className="flex gap-2">
@@ -67,7 +67,7 @@ export function AccountNav({ session }: { session: userSession }) {
                 </Link>
               )}
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               {isMobile ? (
                 <SheetClose asChild>
                   <Link href="/profile/settings" className="flex gap-2">
@@ -86,7 +86,7 @@ export function AccountNav({ session }: { session: userSession }) {
           {session.user.role === UserRoleClient.admin && (
             <DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild className="cursor-pointer">
                 {isMobile ? (
                   <SheetClose asChild>
                     <Link href="/dashboard" className="flex gap-2">

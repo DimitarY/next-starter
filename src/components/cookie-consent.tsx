@@ -77,11 +77,15 @@ export default function CookieConsent() {
               </Link>
             </p>
           </div>
-          <div className="border-border dark:bg-background/20 flex gap-2 border-t p-4 py-5">
-            <Button onClick={accept} className="w-full">
+          <div className="border-border dark:bg-background/20 flex flex-col gap-2 border-t p-4 py-5">
+            <Button onClick={accept} className="w-full cursor-pointer">
               Accept
             </Button>
-            <Button onClick={decline} className="w-full" variant="secondary">
+            <Button
+              onClick={decline}
+              className="w-full cursor-pointer"
+              variant="secondary"
+            >
               Decline
             </Button>
           </div>

@@ -32,7 +32,7 @@ export function AuthSocialButtons({
     <div className={cn("grid w-full items-center gap-2", className)}>
       <Button
         size="lg"
-        className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-white dark:text-black dark:hover:bg-gray-100"
+        className="w-full cursor-pointer rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-white dark:text-black dark:hover:bg-gray-100"
         variant="link"
         onClick={() => onClick("google")}
       >
@@ -40,7 +40,7 @@ export function AuthSocialButtons({
       </Button>
       <Button
         size="lg"
-        className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-gray-800"
+        className="w-full cursor-pointer rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-gray-800"
         variant="link"
         onClick={() => onClick("github")}
       >

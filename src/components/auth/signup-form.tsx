@@ -184,7 +184,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
             <FormSuccess message={success} />
             <FormError message={error} />
             <Button
-              className="w-full"
+              className="w-full cursor-pointer"
               variant="default"
               type="submit"
               disabled={server_RegisterActionIsPending}

@@ -116,7 +116,7 @@ function MagicLinkForm({
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button
-            className="w-full"
+            className="w-full cursor-pointer"
             variant="default"
             type="submit"
             disabled={server_MagicLinkIsPending}
@@ -250,7 +250,7 @@ function CredentialsForm({
           />
           <FormError message={error} />
           <Button
-            className="w-full"
+            className="w-full cursor-pointer"
             variant="default"
             type="submit"
             disabled={server_LoginActionIsPending}
@@ -258,7 +258,11 @@ function CredentialsForm({
             Login
           </Button>
           {/*TODO: Update style*/}
-          <Button variant="secondary" className="w-full" onClick={onBack}>
+          <Button
+            variant="secondary"
+            className="w-full cursor-pointer"
+            onClick={onBack}
+          >
             Back
           </Button>
         </div>
