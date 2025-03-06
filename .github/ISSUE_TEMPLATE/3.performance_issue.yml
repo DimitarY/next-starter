@@ -1,0 +1,43 @@
+name: "🐢 Performance Issue"
+description: Report slow performance or high resource usage
+title: "[Performance]: "
+labels: ["performance"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Performance Issue Report  
+        Please describe the issue clearly.
+
+  - type: input
+    id: affected_area
+    attributes:
+      label: Affected Area
+      placeholder: "Example: API, UI, Database, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Explain where and how performance is impacted
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_performance
+    attributes:
+      label: Expected Performance
+      description: Describe the expected behavior or improvement
+    validations:
+      required: false
+
+  - type: textarea
+    id: profiling_data
+    attributes:
+      label: Profiling Data
+      description: Provide logs, metrics, or profiling data if available
+    validations:
+      required: false
