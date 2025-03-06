@@ -14,8 +14,22 @@ import React from "react";
 import { extractRouterConfig } from "uploadthing/server";
 
 export const metadata: Metadata = {
-  title: siteConfig.title,
+  title: {
+    default: siteConfig.title,
+    template: `${siteConfig.title} - %s`,
+  },
   description: siteConfig.description,
+  openGraph: {
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+    type: "website",
+  },
 };
 
 export default async function RootLayout({
