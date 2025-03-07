@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 10
 
     env:
-      NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+      NEXT_PUBLIC_BASE_URL: ${{ vars.NEXT_PUBLIC_BASE_URL }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RESEND_DOMAIN: ${{ secrets.RESEND_DOMAIN }}
@@ -69,8 +69,8 @@ jobs:
         id: build_image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ secrets.CONTAINER_IMAGE_NAME }}
+          image: ${{ vars.CONTAINER_IMAGE_NAME }}
           tags: ci
           build-args: |
-            NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
+            NEXT_PUBLIC_BASE_URL=${{ vars.NEXT_PUBLIC_BASE_URL }}
           containerfiles: ./Containerfile

@@ -27,12 +27,12 @@ jobs:
         id: build_image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ secrets.CONTAINER_IMAGE_NAME }}
+          image: ${{ vars.CONTAINER_IMAGE_NAME }}
           tags: |
             ${{ github.event.release.tag_name }}
             ${{ env.LATEST_RELEASE_TAG_NAME == github.event.release.tag_name && 'latest' || '' }}
           build-args: |
-            NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
+            NEXT_PUBLIC_BASE_URL=${{ vars.NEXT_PUBLIC_BASE_URL }}
           containerfiles: ./Containerfile
 
       - name: Push To Registry
@@ -40,6 +40,6 @@ jobs:
         with:
           image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
-          registry: ${{ secrets.CONTAINER_REGISTRY }}
-          username: ${{ secrets.CONTAINER_REGISTRY_USER }}
+          registry: ${{ vars.CONTAINER_REGISTRY }}
+          username: ${{ vars.CONTAINER_REGISTRY_USER }}
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
