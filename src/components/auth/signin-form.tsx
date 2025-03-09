@@ -21,20 +21,19 @@ import { LoginSchema, MagicLinkSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface SignInFormProps {
-  className?: string;
+interface MagicLinkFormProps {
+  onShowCredentials: (email: string) => void;
 }
 
-function MagicLinkForm({
-  onShowCredentials,
-}: {
-  onShowCredentials: (email: string) => void;
-}) {
+function MagicLinkForm({ onShowCredentials }: MagicLinkFormProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -44,7 +43,12 @@ function MagicLinkForm({
   } = useMutation({
     mutationFn: MagicLinkAction,
     onMutate: () => {
+      // eslint-disable-next-line drizzle/enforce-delete-with-where
+      params.delete("error");
+
       setError("");
+
+      router.push(`?${params.toString()}`);
     },
     onSuccess: async (data) => {
       if (!data.success) {
@@ -129,20 +133,21 @@ function MagicLinkForm({
   );
 }
 
-function CredentialsForm({
-  email,
-  onBack,
-}: {
+interface CredentialsFormProps {
   email?: string;
   onBack: () => void;
-}) {
-  const search = useSearchParams();
+}
+
+function CredentialsForm({ email, onBack }: CredentialsFormProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
   const [error, setError] = useState<string>("");
 
-  const { mutate: server_LoginAction, isPending: server_LoginActionIsPending } =
+  const { mutate: LoginMutation, isPending: LoginMutationIsPending } =
     useMutation({
       mutationFn: async (values: z.infer<typeof LoginSchema>) => {
-        const callbackUrl = search.get("callbackUrl");
+        const callbackUrl = params.get("callbackUrl");
 
         const { error } = await auth.signIn.email({
           email: values.email,
@@ -150,24 +155,51 @@ function CredentialsForm({
           callbackURL: callbackUrl || "/",
         });
 
+        console.log("error", error);
+
         if (error) {
-          if (error.status === 401) {
-            return { success: false, error: "Invalid email or password" };
-          } else if (error.status === 403) {
-            return { success: false, error: "Email not verified" };
-          } else {
-            return { success: false, error: "An unexpected error occurred" };
-          }
+          return { success: false, error: error };
         } else {
-          return { success: true, error: "" };
+          return { success: true, error: null };
         }
       },
       onMutate: () => {
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        params.delete("error");
+
         setError("");
+
+        router.replace(`?${params.toString()}`);
       },
       onSuccess: async (data) => {
-        if (!data.success) {
-          setError(data.error);
+        if (!data.success && data.error) {
+          switch (data.error.status) {
+            case 401: {
+              // TODO: Add message for when user try to login with email, but don't have a credential account
+              if (data.error.code === "INVALID_EMAIL_OR_PASSWORD") {
+                setError("Invalid email or password");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 403: {
+              if (data.error.code === "INVALID_ORIGIN") {
+                params.set("error", "Configuration");
+              } else if (data.error.code === "EMAIL_NOT_VERIFIED") {
+                setError("Email not verified");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
+
+          router.replace(`?${params.toString()}`);
         }
       },
       onError: () => {
@@ -187,7 +219,7 @@ function CredentialsForm({
   });
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-    server_LoginAction(values);
+    LoginMutation(values);
   };
 
   const { setFocus } = form;
@@ -202,7 +234,9 @@ function CredentialsForm({
   // Focus password field when an error is set
   useEffect(() => {
     if (error) {
-      setFocus("password");
+      setTimeout(() => {
+        setFocus("password");
+      }, 10); // Small delay ensures React updates first
     }
   }, [error, setFocus]);
 
@@ -222,7 +256,7 @@ function CredentialsForm({
                       placeholder="you@example.com"
                       {...field}
                       type="email"
-                      disabled={server_LoginActionIsPending}
+                      disabled={LoginMutationIsPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -241,7 +275,7 @@ function CredentialsForm({
                     placeholder="password"
                     {...field}
                     type="password"
-                    disabled={server_LoginActionIsPending}
+                    disabled={LoginMutationIsPending}
                   />
                 </FormControl>
                 <FormMessage />
@@ -253,7 +287,7 @@ function CredentialsForm({
             className="w-full cursor-pointer"
             variant="default"
             type="submit"
-            disabled={server_LoginActionIsPending}
+            disabled={LoginMutationIsPending}
           >
             Login
           </Button>
@@ -269,6 +303,10 @@ function CredentialsForm({
       </form>
     </Form>
   );
+}
+
+interface SignInFormProps {
+  className?: string;
 }
 
 export function SignInForm({ className }: SignInFormProps) {

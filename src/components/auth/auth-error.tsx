@@ -9,7 +9,7 @@ enum Error {
   OAuthAccountNotLinked = "OAuthAccountNotLinked",
   AccessDenied = "AccessDenied",
   Verification = "Verification",
-  Default = "Default",
+  Unknown = "Unknown",
 }
 
 const errorMap = {
@@ -19,6 +19,7 @@ const errorMap = {
       contact support if the problem continues.
     </p>
   ),
+  // FIXME: Not implemented
   [Error.OAuthAccountNotLinked]: (
     <p>
       It looks like your email is already linked to another account. Please sign
@@ -31,13 +32,14 @@ const errorMap = {
       please contact support for assistance.
     </p>
   ),
+  // FIXME: Not implemented
   [Error.Verification]: (
     <p>
       Your verification link is no longer valid. It may have expired or already
       been used. Please request a new one.
     </p>
   ),
-  [Error.Default]: (
+  [Error.Unknown]: (
     <p>
       Something went wrong. Please try again or reach out to support if you
       continue to experience this issue.
@@ -49,6 +51,7 @@ interface AuthErrorMessageProps {
   className?: string;
 }
 
+// FIXME: Need to integrate this with better-auth
 function AuthError({ className }: AuthErrorMessageProps) {
   const search = useSearchParams();
   const error = search.get("error") as Error;

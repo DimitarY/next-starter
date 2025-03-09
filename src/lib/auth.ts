@@ -25,7 +25,9 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
+    // requireEmailVerification: true, // FIXME: This is sending email verification request on every login attempt. It is too expensive
     // TODO: Add sendResetPassword
+    // FIXME: When user is registered with social provider and don't have a credential account, the return error code is "INVALID_EMAIL_OR_PASSWORD"
   },
   emailVerification: {
     // TODO: Add rate limiting

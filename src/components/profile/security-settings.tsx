@@ -46,7 +46,7 @@ interface ConnectSocialButtonsProps {
   magicLinkEnabled: boolean;
 }
 
-export function ConnectSocialButtons({
+function ConnectSocialButtons({
   className,
   connectedAccounts,
   usePassword,
@@ -141,6 +141,7 @@ export function ConnectSocialButtons({
         {connectedAccounts.includes("github") ? "Disconnect" : "Connect"} with
         Github
       </Button>
+      {/*FIXME: We don't watch for errors here*/}
       <AuthErrorMessage />
     </div>
   );

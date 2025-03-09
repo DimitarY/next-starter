@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
 
@@ -18,14 +18,29 @@ export function AuthSocialButtons({
   googleButtonText = "Sign in with Google",
   githubButtonText = "Sign in with Github",
 }: AuthSocialButtonsProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
 
   const onClick = async (provider: "google" | "github") => {
-    await auth.signIn.social({
+    const { error } = await auth.signIn.social({
       provider: provider,
       callbackURL: callbackUrl || "/",
     });
+
+    if (error) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (error.status === 403) {
+        params.set("error", "AccessDenied");
+        if (error.code === "INVALID_ORIGIN") {
+          params.set("error", "Configuration");
+        }
+      } else {
+        params.set("error", "Unknown");
+      }
+
+      router.push(`?${params.toString()}`);
+    }
   };
 
   return (
