@@ -48,8 +48,8 @@ export function ProfilePictureCard(props: { user: User }) {
 
         setNewImageLoading(true);
         await Promise.all([
-          UpdateUserImageAction(uploadedFile.url),
-          waitForImageToLoad(uploadedFile.url).catch((error) =>
+          UpdateUserImageAction(uploadedFile.ufsUrl),
+          waitForImageToLoad(uploadedFile.ufsUrl).catch((error) =>
             toast("Failed to upload profile picture", {
               description: error.message,
             }),
@@ -175,7 +175,9 @@ export function ProfilePictureCard(props: { user: User }) {
                 onClick={() => {
                   setFile(null);
                   if (inputRef.current) inputRef.current.value = "";
-                  if (output) setOutput(null);
+                  if (output) {
+                    setOutput(null);
+                  }
                 }}
               >
                 <XIcon className="size-5" />

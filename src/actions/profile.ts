@@ -1,10 +1,7 @@
 "use server";
 
-import { db } from "@/db";
-import { user } from "@/db/schema/user";
 import { auth } from "@/lib/auth";
 import { utapi } from "@/uploadthing/server";
-import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
@@ -14,7 +11,7 @@ import { headers } from "next/headers";
  * and updating the database record
  */
 export async function UpdateUserImageAction(url: string) {
-  // FIXME: Update
+  // FIXME: Cached session is not updated
   // await unstable_update({ user: { image: url } });
   console.log("URL:", url); // REMOVE_ME
   revalidatePath("/", "layout");
@@ -22,27 +19,26 @@ export async function UpdateUserImageAction(url: string) {
 
 export async function RemoveUserImageAction() {
   try {
-    const session = await auth.api.getSession({
+    const sessionObj = await auth.api.getSession({
       headers: await headers(),
     });
 
-    if (!session) {
+    if (!sessionObj) {
       return;
     }
 
-    if (!session.user.image || !session.user.id) {
+    if (!sessionObj.user.image) {
       return;
     }
 
-    // FIXME: Update
-    // await unstable_update({ user: { image: null } });
+    await auth.api.updateUser({
+      headers: await headers(),
+      body: {
+        image: null,
+      },
+    });
 
-    await db
-      .update(user)
-      .set({ image: null })
-      .where(eq(user.id, session.user.id));
-
-    const key = session.user.image.split("/f/")[1];
+    const key = sessionObj.user.image.split("/f/")[1];
 
     await utapi.deleteFiles(key);
   } catch (error) {

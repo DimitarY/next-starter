@@ -9,8 +9,8 @@ const nextConfig: NextConfig = {
       // User uploaded images
       {
         protocol: "https",
-        hostname: "utfs.io",
-        // pathname: "/a/<APP_ID>/*", // Replace <APP_ID> with your app ID
+        hostname: "*.ufs.sh", // Replace * with your app ID
+        pathname: "/f/**",
       },
       // Google OAuth profile images
       {
