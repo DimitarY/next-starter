@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +30,7 @@ import {
 } from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Session } from "better-auth";
 import { useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -36,116 +38,8 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
 import { toast } from "sonner";
+import { UAParser } from "ua-parser-js";
 import { z } from "zod";
-
-interface ConnectSocialButtonsProps {
-  className?: string;
-  connectedAccounts: string[];
-  usePassword: boolean;
-  emailVerified: boolean;
-  magicLinkEnabled: boolean;
-}
-
-function ConnectSocialButtons({
-  className,
-  connectedAccounts,
-  usePassword,
-  emailVerified,
-  magicLinkEnabled,
-}: ConnectSocialButtonsProps) {
-  const [error, setError] = useState<string | undefined>("");
-
-  const router = useRouter();
-
-  const {
-    mutate: server_DisconnectAccountAction,
-    isPending: server_DisconnectAccountActionIsPending,
-  } = useMutation({
-    mutationFn: async (provider: string) => {
-      const { error } = await auth.unlinkAccount({
-        providerId: provider,
-      });
-
-      if (error) {
-        return { success: false, error: "An unexpected error occurred" };
-      } else {
-        return { success: true, error: "" };
-      }
-    },
-    onMutate: () => {
-      setError("");
-    },
-    // onSuccess: async (data) => {
-    onSuccess: async (data) => {
-      if (!data.success) {
-        setError(data.error);
-      } else {
-        router.refresh();
-      }
-    },
-    onError: () => {
-      setError("An unexpected error occurred. Please try again.");
-    },
-  });
-
-  const onClick = (provider: "google" | "github") => {
-    setError("");
-
-    if (connectedAccounts.includes(provider)) {
-      if (
-        connectedAccounts.length > 1 ||
-        (emailVerified && magicLinkEnabled) ||
-        usePassword
-      ) {
-        server_DisconnectAccountAction(provider);
-      } else {
-        setError(
-          "Your can not disconnect from every account without using magic link or password!",
-        );
-      }
-    } else {
-      auth.linkSocial({
-        provider: provider,
-        callbackURL: window.location.href,
-      });
-    }
-  };
-
-  return (
-    <div className={cn("grid w-full items-center gap-2", className)}>
-      {error && (
-        <Alert className="text-2xl" variant="destructive">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription className="text-lg">{error}</AlertDescription>
-        </Alert>
-      )}
-      <Button
-        size="lg"
-        className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-white dark:text-black dark:hover:bg-gray-100"
-        variant="link"
-        onClick={() => onClick("google")}
-        disabled={server_DisconnectAccountActionIsPending}
-      >
-        <FcGoogle className="size-5" />{" "}
-        {connectedAccounts.includes("google") ? "Disconnect" : "Connect"} with
-        Google
-      </Button>
-      <Button
-        size="lg"
-        className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-gray-800"
-        variant="link"
-        onClick={() => onClick("github")}
-        disabled={server_DisconnectAccountActionIsPending}
-      >
-        <VscGithubAlt className="size-5" />
-        {connectedAccounts.includes("github") ? "Disconnect" : "Connect"} with
-        Github
-      </Button>
-      {/*FIXME: We don't watch for errors here*/}
-      <AuthErrorMessage />
-    </div>
-  );
-}
 
 const ModuleWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
   const modules = React.Children.toArray(children);
@@ -421,72 +315,271 @@ function SetPasswordForm() {
   );
 }
 
+interface ConnectSocialButtonsProps {
+  className?: string;
+  connectedAccounts: string[];
+  usePassword: boolean;
+  emailVerified: boolean;
+  magicLinkEnabled: boolean;
+}
+
+// TODO: This need rework
+function ConnectSocialButtons({
+  className,
+  connectedAccounts,
+  usePassword,
+  emailVerified,
+  magicLinkEnabled,
+}: ConnectSocialButtonsProps) {
+  const [error, setError] = useState<string | undefined>("");
+
+  const router = useRouter();
+
+  const {
+    mutate: server_DisconnectAccountAction,
+    isPending: server_DisconnectAccountActionIsPending,
+  } = useMutation({
+    mutationFn: async (provider: string) => {
+      const { error } = await auth.unlinkAccount({
+        providerId: provider,
+      });
+
+      if (error) {
+        return { success: false, error: "An unexpected error occurred" };
+      } else {
+        return { success: true, error: "" };
+      }
+    },
+    onMutate: () => {
+      setError("");
+    },
+    // onSuccess: async (data) => {
+    onSuccess: async (data) => {
+      if (!data.success) {
+        setError(data.error);
+      } else {
+        router.refresh();
+      }
+    },
+    onError: () => {
+      setError("An unexpected error occurred. Please try again.");
+    },
+  });
+
+  const onClick = (provider: "google" | "github") => {
+    setError("");
+
+    if (connectedAccounts.includes(provider)) {
+      if (
+        connectedAccounts.length > 1 ||
+        (emailVerified && magicLinkEnabled) ||
+        usePassword
+      ) {
+        server_DisconnectAccountAction(provider);
+      } else {
+        setError(
+          "Your can not disconnect from every account without using magic link or password!",
+        );
+      }
+    } else {
+      auth.linkSocial({
+        provider: provider,
+        callbackURL: window.location.href,
+      });
+    }
+  };
+
+  return (
+    <div className={cn("grid w-full items-center gap-2", className)}>
+      {error && (
+        <Alert className="text-2xl" variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription className="text-lg">{error}</AlertDescription>
+        </Alert>
+      )}
+      <Button
+        size="lg"
+        className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-white dark:text-black dark:hover:bg-gray-100"
+        variant="link"
+        onClick={() => onClick("google")}
+        disabled={server_DisconnectAccountActionIsPending}
+      >
+        <FcGoogle className="size-5" />{" "}
+        {connectedAccounts.includes("google") ? "Disconnect" : "Connect"} with
+        Google
+      </Button>
+      <Button
+        size="lg"
+        className="w-full rounded-md border border-gray-300 bg-white text-black hover:bg-gray-100 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-gray-800"
+        variant="link"
+        onClick={() => onClick("github")}
+        disabled={server_DisconnectAccountActionIsPending}
+      >
+        <VscGithubAlt className="size-5" />
+        {connectedAccounts.includes("github") ? "Disconnect" : "Connect"} with
+        Github
+      </Button>
+      {/*FIXME: We don't watch for errors here*/}
+      <AuthErrorMessage />
+    </div>
+  );
+}
+
+interface SessionManagementProps {
+  className?: string;
+  session: Session;
+  sessionsList: Session[];
+}
+
+function SessionManagement({
+  className,
+  session,
+  sessionsList,
+}: SessionManagementProps) {
+  const router = useRouter();
+
+  const handleSignOut = async (sessionToken?: string) => {
+    if (sessionToken) {
+      await auth.revokeSession({
+        token: sessionToken,
+      });
+    } else {
+      await auth.revokeOtherSessions();
+    }
+
+    // TODO: Revoke cached session cookie
+
+    router.refresh();
+  };
+
+  return (
+    <div className={cn("flex flex-col gap-6 p-6", className)}>
+      <h2 className="text-xl font-bold">Active Sessions</h2>
+      <div className="space-y-4">
+        {sessionsList.map((userSession) => {
+          const parser = new UAParser();
+
+          parser.setUA(userSession.userAgent || "");
+
+          const { browser, os, device } = parser.getResult();
+          const deviceType = device.type === "mobile" ? "Phone" : "PC";
+          const isCurrentSession = userSession.id === session.id;
+
+          const userLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+
+          const formattedCreatedAt = new Date(
+            userSession.createdAt,
+          ).toLocaleString(userLocale);
+          const formattedExpiresAt = new Date(
+            userSession.expiresAt,
+          ).toLocaleString(userLocale);
+
+          return (
+            <Card
+              key={userSession.id}
+              className={isCurrentSession ? "border-primary border-2" : ""}
+            >
+              <CardContent className="space-y-2 p-4">
+                <p className="text-sm">
+                  <strong>IP Address:</strong> {userSession.ipAddress}
+                </p>
+                <p className="text-sm">
+                  <strong>Device:</strong> {deviceType} (
+                  {device.model || "Unknown Model"})
+                </p>
+                <p className="text-sm">
+                  <strong>Operating System:</strong> {os.name ?? "Unknown OS"}
+                </p>
+                <p className="text-sm">
+                  <strong>Browser:</strong> {browser.name ?? "Unknown Browser"}
+                </p>
+                <p className="text-sm">
+                  <strong>Created At:</strong> {formattedCreatedAt}
+                </p>
+                <p className="text-sm">
+                  <strong>Expires At:</strong> {formattedExpiresAt}
+                </p>
+                {isCurrentSession && (
+                  <p className="text-primary font-semibold">
+                    This is your current session
+                  </p>
+                )}
+                {!isCurrentSession && (
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSignOut(userSession.token)}
+                    className="mt-2 w-full"
+                  >
+                    Sign out
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      <Separator />
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-base font-medium">Sign out</p>
+          <p className="text-muted-foreground text-sm">
+            Sign out from all other devices
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => handleSignOut()}>
+          Sign out from all devices
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface SecuritySettingsProps {
+  MagicLinkEnable: boolean;
+  MagicLinkAllow: boolean;
+  UsePassword: boolean;
+  Accounts: string[];
+  EmailVerified: boolean;
+  Session: Session;
+  SessionsList: Session[];
+}
+
 export function SecuritySettings({
   MagicLinkEnable,
   MagicLinkAllow,
   UsePassword,
   Accounts,
   EmailVerified,
-}: {
-  MagicLinkEnable: boolean;
-  MagicLinkAllow: boolean;
-  UsePassword: boolean;
-  Accounts: string[];
-  EmailVerified: boolean;
-}) {
+  Session,
+  SessionsList,
+}: SecuritySettingsProps) {
   const [isMagicLinkEnabled, setIsMagicLinkEnabled] = useState(MagicLinkEnable);
   const isMagicLinkAllow = MagicLinkAllow;
 
-  const {
-    mutate: server_LogoutFromAllDevicesAction,
-    isPending: server_LogoutFromAllDevicesIsPending,
-  } = useMutation({
-    mutationFn: async () => {
-      // Simulate API call (replace with actual API request logic)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ success: true });
-        }, 1000);
-      });
-    },
-    onSuccess: () => {
-      toast("Success!", {
-        description: "Successfully logged out from all devices.",
-      });
-    },
-    onError: () => {
-      toast("Error!", {
-        description: "An unexpected error occurred. Please try again.",
-      });
-    },
-  });
-
-  const {
-    mutate: server_EnableMagicLinkAction,
-    isPending: server_EnableMagicLinkIsPending,
-  } = useMutation({
-    mutationFn: async () => {
-      // Simulate API call (replace with actual API request logic)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ success: true });
-        }, 1000);
-      });
-    },
-    onSuccess: () => {
-      setIsMagicLinkEnabled(!isMagicLinkEnabled);
-      toast("Success!", {
-        description: isMagicLinkEnabled
-          ? "Magic link login enabled. Password login is now disabled."
-          : "Magic link login disabled. Password login is re-enabled.",
-      });
-    },
-    onError: () => {
-      toast("Error!", {
-        description: "An unexpected error occurred. Please try again.",
-      });
-    },
-  });
+  const { mutate: EnableMagicLink, isPending: EnableMagicLinkIsPending } =
+    useMutation({
+      mutationFn: async () => {
+        // Simulate API call (replace with actual API request logic)
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ success: true });
+          }, 1000);
+        });
+      },
+      onSuccess: () => {
+        setIsMagicLinkEnabled(!isMagicLinkEnabled);
+        toast("Success!", {
+          description: isMagicLinkEnabled
+            ? "Magic link login enabled. Password login is now disabled."
+            : "Magic link login disabled. Password login is re-enabled.",
+        });
+      },
+      onError: () => {
+        toast("Error!", {
+          description: "An unexpected error occurred. Please try again.",
+        });
+      },
+    });
 
   return (
     <Card>
@@ -505,24 +598,6 @@ export function SecuritySettings({
             usePassword={UsePassword}
             magicLinkEnabled={MagicLinkEnable}
           />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-base font-medium">Logout</p>
-              <p className="text-muted-foreground text-sm">
-                Logout from all devices
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                server_LogoutFromAllDevicesAction();
-              }}
-              disabled={server_LogoutFromAllDevicesIsPending}
-            >
-              Logout from all devices
-            </Button>
-          </div>
           {isMagicLinkAllow && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
@@ -536,9 +611,9 @@ export function SecuritySettings({
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    server_EnableMagicLinkAction();
+                    EnableMagicLink();
                   }}
-                  disabled={server_EnableMagicLinkIsPending}
+                  disabled={EnableMagicLinkIsPending}
                 >
                   {isMagicLinkEnabled
                     ? "Disable Magic Link"
@@ -553,6 +628,7 @@ export function SecuritySettings({
               )}
             </div>
           )}
+          <SessionManagement session={Session} sessionsList={SessionsList} />
         </ModuleWrapper>
       </CardContent>
       <CardFooter></CardFooter>

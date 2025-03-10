@@ -57,6 +57,12 @@ export const auth = betterAuth({
       trustedProviders: ["google", "github"],
     },
   },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60, // Cache duration in seconds
+    },
+  },
   plugins: [
     admin({
       defaultRole: "user",

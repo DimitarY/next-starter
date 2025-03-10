@@ -12,13 +12,17 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Settings() {
-  const session = await auth.api.getSession({
+  const sessionObj = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session) {
+  if (!sessionObj) {
     redirect("/");
   }
+
+  const sessions = await auth.api.listSessions({
+    headers: await headers(),
+  });
 
   const userSettingsInfo = await db
     .select({
@@ -32,7 +36,7 @@ export default async function Settings() {
     })
     .from(user)
     .leftJoin(account, eq(user.id, account.userId))
-    .where(eq(user.id, session.user.id))
+    .where(eq(user.id, sessionObj.user.id))
     .groupBy(
       user.id,
       user.name,
@@ -51,14 +55,16 @@ export default async function Settings() {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-5">
-      <ProfilePictureCard user={session.user} />
-      <GeneralSettings user={session.user} />
+      <ProfilePictureCard user={sessionObj.user} />
+      <GeneralSettings user={sessionObj.user} />
       <SecuritySettings
         MagicLinkEnable={magicLinkEnabled}
         MagicLinkAllow={allowMagicLink}
         UsePassword={usePassword}
         Accounts={accounts}
         EmailVerified={emailVerified}
+        Session={sessionObj.session}
+        SessionsList={sessions}
       />
       <DeleteAccount />
     </div>
