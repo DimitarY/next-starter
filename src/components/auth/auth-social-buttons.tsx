@@ -26,6 +26,7 @@ export function AuthSocialButtons({
     const { error } = await auth.signIn.social({
       provider: provider,
       callbackURL: callbackUrl || "/",
+      errorCallbackURL: window.location.href,
     });
 
     if (error) {

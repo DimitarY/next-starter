@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 enum Error {
   Configuration = "Configuration",
-  OAuthAccountNotLinked = "OAuthAccountNotLinked",
+  AccountNotLinked = "account_not_linked",
   AccessDenied = "AccessDenied",
   Verification = "Verification",
   Unknown = "Unknown",
@@ -19,8 +19,7 @@ const errorMap = {
       contact support if the problem continues.
     </p>
   ),
-  // FIXME: Not implemented
-  [Error.OAuthAccountNotLinked]: (
+  [Error.AccountNotLinked]: (
     <p>
       It looks like your email is already linked to another account. Please sign
       in using the provider you used before.

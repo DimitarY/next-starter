@@ -40,7 +40,6 @@ export const auth = betterAuth({
     },
   },
   socialProviders: {
-    // FIXME: Block user from signing in with social providers if there is an credential account with the same email
     google: {
       clientId: env.BETTER_AUTH_GOOGLE_CLIENT_ID,
       clientSecret: env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
@@ -52,9 +51,10 @@ export const auth = betterAuth({
   },
   account: {
     accountLinking: {
-      enabled: true,
+      enabled: false,
       allowMultipleAccounts: true,
       allowDifferentEmails: true,
+      trustedProviders: ["google", "github"],
     },
   },
   plugins: [
