@@ -1,4 +1,5 @@
 import MagicLinkEmail from "@/components/emails/magic-link";
+import PasswordResetEmail from "@/components/emails/password-reset";
 import VerifyEmailEmail from "@/components/emails/verify-email";
 import { siteConfig } from "@/config/site";
 import { env } from "@/env";
@@ -9,7 +10,7 @@ interface Params {
   url: string;
 }
 
-export async function sendMagicLink({
+export async function sendResetPasswordEmail({
   identifier,
   url,
 }: Params): Promise<void> {
@@ -18,8 +19,8 @@ export async function sendMagicLink({
   const { error } = await resend.emails.send({
     from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
     to: identifier,
-    subject: `Sign in to ${siteConfig.name}`,
-    react: MagicLinkEmail({ magicLink: url }),
+    subject: "Reset password instructions",
+    react: PasswordResetEmail({ resetLink: url }),
   });
 
   // TODO: Handle error
@@ -37,6 +38,23 @@ export async function sendVerificationRequest({
     to: identifier,
     subject: `Verify your email address`,
     react: VerifyEmailEmail({ verifyLink: url }),
+  });
+
+  // TODO: Handle error
+  console.log("error", error);
+}
+
+export async function sendMagicLink({
+  identifier,
+  url,
+}: Params): Promise<void> {
+  const resend = new Resend(env.RESEND_API_KEY);
+
+  const { error } = await resend.emails.send({
+    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+    to: identifier,
+    subject: `Sign in to ${siteConfig.name}`,
+    react: MagicLinkEmail({ magicLink: url }),
   });
 
   // TODO: Handle error

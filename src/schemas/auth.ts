@@ -30,6 +30,10 @@ export const ForgotPasswordSchema = z.object({
     .trim(),
 });
 
+export const ResetPasswordSchema = z.object({
+  password: z.string().min(1, "Password is required").trim(), // TODO: Add regex validation
+});
+
 export const MagicLinkSchema = z.object({
   email: z
     .string()

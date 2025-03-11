@@ -4,7 +4,11 @@ import { session } from "@/db/schema/session";
 import { user } from "@/db/schema/user";
 import { verification } from "@/db/schema/verification";
 import { env } from "@/env";
-import { sendMagicLink, sendVerificationRequest } from "@/lib/authSendRequest";
+import {
+  sendMagicLink,
+  sendResetPasswordEmail,
+  sendVerificationRequest,
+} from "@/lib/authSendRequest";
 import { createEnumObject } from "@/lib/utils";
 import { betterAuth, User as User_Original } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -26,8 +30,13 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
     // requireEmailVerification: true, // FIXME: This is sending email verification request on every login attempt. It is too expensive
-    // TODO: Add sendResetPassword
-    // FIXME: When user is registered with social provider and don't have a credential account, the return error code is "INVALID_EMAIL_OR_PASSWORD"
+    resetPasswordTokenExpiresIn: env.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
+    sendResetPassword: async ({ user, url }) => {
+      await sendResetPasswordEmail({
+        identifier: user.email,
+        url: url,
+      });
+    },
   },
   emailVerification: {
     // TODO: Add rate limiting

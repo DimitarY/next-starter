@@ -18,13 +18,17 @@ export const env = createEnv({
     BETTER_AUTH_GITHUB_CLIENT_ID: z.string(),
     BETTER_AUTH_GITHUB_CLIENT_SECRET: z.string(),
     UPLOADTHING_TOKEN: z.string(),
-    MAGIC_LINK_EXPIRES_IN_SECONDS: z
+    RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS: z
       .string()
-      .default((60 * 5).toString())
+      .default((3600).toString())
       .transform((val) => Number(val)),
     EMAIL_VERIFICATION_EXPIRES_IN_SECONDS: z
       .string()
       .default((3600).toString())
+      .transform((val) => Number(val)),
+    MAGIC_LINK_EXPIRES_IN_SECONDS: z
+      .string()
+      .default((300).toString())
       .transform((val) => Number(val)),
   },
   client: {

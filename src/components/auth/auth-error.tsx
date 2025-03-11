@@ -9,6 +9,7 @@ enum Error {
   AccountNotLinked = "account_not_linked",
   AccessDenied = "AccessDenied",
   Verification = "Verification",
+  InvalidToken = "INVALID_TOKEN",
   Unknown = "Unknown",
 }
 
@@ -37,6 +38,9 @@ const errorMap = {
       Your verification link is no longer valid. It may have expired or already
       been used. Please request a new one.
     </p>
+  ),
+  [Error.InvalidToken]: (
+    <p>Your link is no longer valid. Please request a new one.</p>
   ),
   [Error.Unknown]: (
     <p>
