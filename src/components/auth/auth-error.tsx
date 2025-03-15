@@ -54,7 +54,6 @@ interface AuthErrorMessageProps {
   className?: string;
 }
 
-// FIXME: Need to integrate this with better-auth
 function AuthError({ className }: AuthErrorMessageProps) {
   const search = useSearchParams();
   const error = search.get("error") as Error;

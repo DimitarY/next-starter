@@ -41,7 +41,6 @@ export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
           redirectTo: "/auth/reset-password",
         });
 
-        // TODO: Error handling is not tested
         console.log("error", error);
 
         if (error) {

@@ -311,7 +311,6 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
           >
             Login
           </Button>
-          {/*TODO: Update style*/}
           <Button
             variant="secondary"
             className="w-full cursor-pointer"

@@ -26,7 +26,6 @@ export default async function Signout() {
   const userEmail = session.user.email;
   const profileImage = session.user.image || "";
 
-  // FIXME: Vertical centering is broken
   async function handleSubmit() {
     "use server";
     await auth.api.signOut({
@@ -36,7 +35,7 @@ export default async function Signout() {
   }
 
   return (
-    <div className="flex grow items-center justify-center px-4">
+    <div className="mt-[20dvh] flex justify-center px-4">
       <form action={handleSubmit}>
         <Card className="w-[350px]">
           <CardHeader>
