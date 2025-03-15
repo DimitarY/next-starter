@@ -14,7 +14,7 @@ export async function sendResetPasswordEmail({
   identifier,
   url,
 }: Params): Promise<void> {
-  const resend = new Resend("test");
+  const resend = new Resend(env.RESEND_API_KEY);
 
   const { error } = await resend.emails.send({
     from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
