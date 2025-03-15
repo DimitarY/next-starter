@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { ForgotPasswordSchema } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,6 +26,9 @@ interface ForgotPasswordFormProps {
 }
 
 export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -45,6 +49,14 @@ export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
         } else {
           return { success: true, error: null };
         }
+      },
+      onMutate: () => {
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        params.delete("error");
+
+        setError("");
+
+        router.push(`?${params.toString()}`);
       },
       onSuccess: (data) => {
         if (!data.success && data.error) {
