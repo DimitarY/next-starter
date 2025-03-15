@@ -14,7 +14,7 @@ export async function sendResetPasswordEmail({
   identifier,
   url,
 }: Params): Promise<void> {
-  const resend = new Resend(env.RESEND_API_KEY);
+  const resend = new Resend("test");
 
   const { error } = await resend.emails.send({
     from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
@@ -23,8 +23,10 @@ export async function sendResetPasswordEmail({
     react: PasswordResetEmail({ resetLink: url }),
   });
 
-  // TODO: Handle error
-  console.log("error", error);
+  if (error) {
+    // Propagate the error back to better-auth
+    throw new Error(`Reset password email failed: ${error.message}`);
+  }
 }
 
 export async function sendVerificationRequest({
@@ -40,8 +42,10 @@ export async function sendVerificationRequest({
     react: VerifyEmailEmail({ verifyLink: url }),
   });
 
-  // TODO: Handle error
-  console.log("error", error);
+  if (error) {
+    // Propagate the error back to better-auth
+    throw new Error(`Verification email failed: ${error.message}`);
+  }
 }
 
 export async function sendMagicLink({
@@ -57,6 +61,8 @@ export async function sendMagicLink({
     react: MagicLinkEmail({ magicLink: url }),
   });
 
-  // TODO: Handle error
-  console.log("error", error);
+  if (error) {
+    // Propagate the error back to better-auth
+    throw new Error(`Magic link email failed: ${error.message}`);
+  }
 }

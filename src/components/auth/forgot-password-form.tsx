@@ -60,10 +60,25 @@ export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
       },
       onSuccess: (data) => {
         if (!data.success && data.error) {
-          setError(data.error.message as string);
+          switch (data.error.status) {
+            case 500: {
+              if (data.error.statusText === "Internal Server Error") {
+                params.set("error", "Configuration");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
         } else {
           setSuccess("Password reset email sent! Please check your inbox.");
         }
+
+        router.replace(`?${params.toString()}`);
       },
       onError: () => {
         setError("An unexpected error occurred. Please try again.");

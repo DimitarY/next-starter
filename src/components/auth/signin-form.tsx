@@ -58,12 +58,32 @@ function MagicLinkForm({ onShowCredentials }: MagicLinkFormProps) {
           // Call the function to show the CredentialsForm and pass the email
           onShowCredentials(form.getValues().email);
         } else {
-          const { data, error } = await auth.signIn.magicLink({
+          const { error } = await auth.signIn.magicLink({
             email: form.getValues().email,
             callbackURL: "/profile", //redirect after successful login (optional)
           });
-          console.log(data, error);
-          setSuccess("Magic link has been sent");
+
+          if (error) {
+            console.log("error", error);
+            switch (error.status) {
+              case 500: {
+                if (error.statusText === "Internal Server Error") {
+                  params.set("error", "Configuration");
+                } else {
+                  params.set("error", "Unknown");
+                }
+                break;
+              }
+              default: {
+                params.set("error", "Unknown");
+                break;
+              }
+            }
+
+            router.replace(`?${params.toString()}`);
+          } else {
+            setSuccess("Magic link has been sent");
+          }
         }
       }
     },
