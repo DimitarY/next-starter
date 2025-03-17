@@ -5,6 +5,7 @@ import { user } from "@/db/schema/user";
 import { verification } from "@/db/schema/verification";
 import { env } from "@/env";
 import {
+  sendChangeEmailVerification,
   sendMagicLink,
   sendResetPasswordEmail,
   sendVerificationRequest,
@@ -30,23 +31,25 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
     // requireEmailVerification: true, // FIXME: This is sending email verification request on every login attempt. It is too expensive
-    resetPasswordTokenExpiresIn: env.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
     sendResetPassword: async ({ user, url }) => {
+      // TODO: Add rate limiting
       await sendResetPasswordEmail({
         identifier: user.email,
         url: url,
       });
     },
+    resetPasswordTokenExpiresIn: env.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
   },
   emailVerification: {
-    // TODO: Add rate limiting
-    expiresIn: env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS,
     sendVerificationEmail: async ({ user, url }) => {
+      // TODO: Add rate limiting
       await sendVerificationRequest({
         identifier: user.email,
         url: url,
       });
     },
+    expiresIn: env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS,
+    sendOnSignUp: true,
   },
   socialProviders: {
     google: {
@@ -56,6 +59,21 @@ export const auth = betterAuth({
     github: {
       clientId: env.BETTER_AUTH_GITHUB_CLIENT_ID,
       clientSecret: env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
+    },
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
+      // This function triggers when a user have a verified email and changes their email
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        // TODO: Add rate limiting
+        await sendChangeEmailVerification({
+          identifier: user.email,
+          url,
+          newEmail,
+        });
+      },
+      expirationInSeconds: env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS,
     },
   },
   account: {
@@ -78,13 +96,14 @@ export const auth = betterAuth({
       adminRole: "admin",
     }),
     magicLink({
-      expiresIn: env.MAGIC_LINK_EXPIRES_IN_SECONDS,
       sendMagicLink: async ({ email, url }) => {
+        // TODO: Add rate limiting
         await sendMagicLink({
           identifier: email,
           url,
         });
       },
+      expiresIn: env.MAGIC_LINK_EXPIRES_IN_SECONDS,
     }),
     nextCookies(), // make sure nextCookies is the last plugin in the array
   ],

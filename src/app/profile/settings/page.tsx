@@ -1,3 +1,4 @@
+import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { DeleteAccount } from "@/components/profile/delete-account";
 import { GeneralSettings } from "@/components/profile/general-settings";
 import { ProfilePictureCard } from "@/components/profile/profile-picture";
@@ -55,6 +56,7 @@ export default async function Settings() {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-5">
+      <AuthErrorMessage className="mb-4" />
       <ProfilePictureCard user={sessionObj.user} />
       <GeneralSettings user={sessionObj.user} />
       <SecuritySettings
