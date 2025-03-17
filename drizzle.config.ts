@@ -8,4 +8,5 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
+  tablesFilter: ["!pg_stat_statements", "!pg_stat_statements_info"],
 } satisfies Config;
