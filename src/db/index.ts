@@ -3,20 +3,36 @@ import { session } from "@/db/schema/session";
 import { user } from "@/db/schema/user";
 import { verification } from "@/db/schema/verification";
 import { env } from "@/env";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
+import fs from "fs";
+import { Pool } from "pg";
 
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR
  * update.
  */
 const globalForDb = globalThis as unknown as {
-  conn: postgres.Sql | undefined;
+  conn: Pool | undefined;
 };
 
-const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
-if (env.NODE_ENV !== "production") globalForDb.conn = conn;
+/**
+ * Dynamically load the database CA certificate at runtime.
+ * This prevents build-time failures if the certificate is missing.
+ * If the certificate file exists, it is read and used for SSL; otherwise, SSL is disabled.
+ */
+const caPath = "./certificates/database_ca.crt";
+const sslConfig = fs.existsSync(caPath)
+  ? { ca: fs.readFileSync(caPath) }
+  : undefined;
 
-export const db = drizzle(conn, {
+const pool = new Pool({
+  connectionString: env.DATABASE_URL,
+  max: 20,
+  ssl: sslConfig,
+});
+
+if (env.NODE_ENV !== "production") globalForDb.conn = pool;
+
+export const db = drizzle(pool, {
   schema: { user, session, account, verification },
 });

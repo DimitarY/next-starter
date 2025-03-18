@@ -70,17 +70,23 @@ Clone the project
   git clone https://github.com/DimitarY/next-starter
 ```
 
+---
+
 Install dependencies
 
 ```bash
   pnpm install
 ```
 
+---
+
 Start development server
 
 ```bash
   pnpm dev
 ```
+
+---
 
 Build container
 
@@ -92,6 +98,8 @@ Build container
   .
 ```
 
+---
+
 Start container
 
 ```bash
@@ -102,6 +110,13 @@ Start container
   --env-file .env.container \
   ghcr.io/dimitary/next-starter
 ```
+
+> **Note:** If your database connection uses SSL, you must mount the certificate volume.
+>
+> For example: `-v $HOME/next-starter/certificates:/app/certificates:ro`<br>
+> For SELinux, use: `-v $HOME/next-starter/certificates:/app/certificates:ro,Z`
+
+---
 
 Remove **Dangling** images
 
