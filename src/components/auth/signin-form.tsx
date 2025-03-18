@@ -91,7 +91,7 @@ function MagicLinkForm({ onShowCredentials }: MagicLinkFormProps) {
       setError("An unexpected error occurred. Please try again.");
     },
     onSettled: () => {
-      form.setValue("email", "");
+      form.reset();
     },
   });
 
@@ -226,7 +226,11 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
         setError("An unexpected error occurred. Please try again.");
       },
       onSettled: () => {
-        form.setValue("password", "");
+        if (email) {
+          form.setValue("password", "");
+        } else {
+          form.reset();
+        }
       },
     });
 
@@ -304,8 +308,8 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
           />
           <FormError message={error} />
           <Button
-            className="w-full cursor-pointer"
             variant="default"
+            className="w-full cursor-pointer"
             type="submit"
             disabled={LoginMutationIsPending}
           >

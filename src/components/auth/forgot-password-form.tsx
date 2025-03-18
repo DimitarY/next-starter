@@ -83,7 +83,7 @@ export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
         setError("An unexpected error occurred. Please try again.");
       },
       onSettled: () => {
-        form.setValue("email", "");
+        form.reset();
       },
     });
 

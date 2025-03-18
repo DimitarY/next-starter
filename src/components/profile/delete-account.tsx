@@ -22,7 +22,7 @@ import { z } from "zod";
 
 export function DeleteAccount() {
   const [deleteEnable, setDeleteEnable] = useState(false);
-  const [error, setError] = useState<string | undefined>("");
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     let errorTimer: NodeJS.Timeout | undefined;

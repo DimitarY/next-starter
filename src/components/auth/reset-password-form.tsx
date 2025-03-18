@@ -74,7 +74,7 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
         setError("An unexpected error occurred. Please try again.");
       },
       onSettled: () => {
-        form.setValue("password", "");
+        form.reset();
       },
     });
 
