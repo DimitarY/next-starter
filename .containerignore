@@ -5,7 +5,7 @@ certificates
 npm-debug.log
 README.md
 .next
-.git*
+.git
 .env*
 .secrets
 .vars
