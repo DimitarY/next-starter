@@ -449,7 +449,7 @@ function EnableMagicLink({
 
 interface ConnectSocialButtonsProps {
   className?: string;
-  connectedAccounts: string[];
+  connectedAccounts: { accountId: string; providerId: string }[];
 }
 
 function ConnectSocialButtons({
@@ -500,9 +500,10 @@ function ConnectSocialButtons({
 
   const { mutate: DisconnectAccount, isPending: DisconnectAccountIsPending } =
     useMutation({
-      mutationFn: async (provider: string) => {
+      mutationFn: async (values: { providerId: string; accountId: string }) => {
         const { error } = await auth.unlinkAccount({
-          providerId: provider,
+          providerId: values.providerId,
+          accountId: values.accountId,
         });
 
         console.log("error", error);
@@ -552,8 +553,15 @@ function ConnectSocialButtons({
     });
 
   const onClick = (provider: "google" | "github") => {
-    if (connectedAccounts.includes(provider)) {
-      DisconnectAccount(provider);
+    const account = connectedAccounts.find(
+      (account) => account.providerId === provider,
+    );
+
+    if (account) {
+      DisconnectAccount({
+        providerId: account.providerId,
+        accountId: account.accountId,
+      });
     } else {
       ConnectAccount(provider);
     }
@@ -576,7 +584,9 @@ function ConnectSocialButtons({
         disabled={ConnectAccountIsPending || DisconnectAccountIsPending}
       >
         <FcGoogle className="size-5" />{" "}
-        {connectedAccounts.includes("google") ? "Disconnect" : "Connect"} with
+        {connectedAccounts.some((account) => account.providerId === "google")
+          ? "Disconnect from"
+          : "Connect with"}{" "}
         Google
       </Button>
       <Button
@@ -587,7 +597,9 @@ function ConnectSocialButtons({
         disabled={ConnectAccountIsPending || DisconnectAccountIsPending}
       >
         <VscGithubAlt className="size-5" />
-        {connectedAccounts.includes("github") ? "Disconnect" : "Connect"} with
+        {connectedAccounts.some((account) => account.providerId === "github")
+          ? "Disconnect from"
+          : "Connect with"}{" "}
         Github
       </Button>
     </div>
@@ -712,7 +724,7 @@ interface SecuritySettingsProps {
   MagicLinkEnable: boolean;
   MagicLinkAllow: boolean;
   UsePassword: boolean;
-  Accounts: string[];
+  Accounts: { accountId: string; providerId: string }[];
   EmailVerified: boolean;
   Session: Session;
   SessionsList: Session[];

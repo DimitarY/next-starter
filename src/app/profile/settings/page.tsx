@@ -30,8 +30,13 @@ export default async function Settings() {
       id: user.id,
       emailVerified: user.emailVerified,
       usePassword: sql<boolean>`bool_or(${account.password} IS NOT NULL)`,
-      accounts: sql<string[]>`
-          COALESCE(array_agg(DISTINCT ${account.providerId}) FILTER (WHERE ${account.providerId} IS NOT NULL), ARRAY[]::TEXT[])`,
+      accounts: sql<{ providerId: string; accountId: string }[]>`
+      COALESCE(
+        jsonb_agg(DISTINCT jsonb_build_object(
+          'providerId', ${account.providerId},
+          'accountId', ${account.accountId}
+        )) FILTER (WHERE ${account.providerId} IS NOT NULL), '[]'::jsonb
+      )`,
       allowMagicLink: user.allowMagicLink,
       useMagicLink: user.useMagicLink,
     })
