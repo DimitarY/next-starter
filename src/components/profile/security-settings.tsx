@@ -524,6 +524,8 @@ function ConnectSocialButtons({
         }
       },
       onSuccess: async (data) => {
+        const original_params = params;
+
         if (!data.success && data.error) {
           switch (data.error.status) {
             case 400: {
@@ -542,7 +544,9 @@ function ConnectSocialButtons({
             }
           }
 
-          router.push(`?${params.toString()}`);
+          if (original_params.toString() !== params.toString()) {
+            router.push(`?${params.toString()}`);
+          }
         } else {
           router.refresh();
         }

@@ -63,8 +63,8 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0(next@15.2.3(@babel/core@7.24.5)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(uploadthing@7.6.0(next@15.2.3(@babel/core@7.24.5)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(tailwindcss@4.0.15))
       better-auth:
-        specifier: ^1.2.4
-        version: 1.2.4(typescript@5.8.2)
+        specifier: 1.2.5-beta.8
+        version: 1.2.5-beta.8(typescript@5.8.2)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -280,11 +280,11 @@ packages:
     resolution: {integrity: sha512-Y3IR1cRnOxOCDvMmNiym7XpXQ93iGDDPHx+Zj+NM+rg0fBaShfQLkg+hKPaZCEvg5N/LeCo4+Rj/i3FuJsIQaw==}
     engines: {node: '>=6.9.0'}
 
-  '@better-auth/utils@0.2.3':
-    resolution: {integrity: sha512-Ap1GaSmo6JYhJhxJOpUB0HobkKPTNzfta+bLV89HfpyCAHN7p8ntCrmNFHNAVD0F6v0mywFVEUg1FUhNCc81Rw==}
+  '@better-auth/utils@0.2.4':
+    resolution: {integrity: sha512-ayiX87Xd5sCHEplAdeMgwkA0FgnXsEZBgDn890XHHwSWNqqRZDYOq3uj2Ei2leTv1I2KbG5HHn60Ah1i2JWZjQ==}
 
-  '@better-fetch/fetch@1.1.15':
-    resolution: {integrity: sha512-0Bl8YYj1f8qCTNHeSn5+1DWv2hy7rLBrQ8rS8Y9XYloiwZEfc3k4yspIG0llRxafxqhGCwlGRg+F8q1HZRCMXA==}
+  '@better-fetch/fetch@1.1.17':
+    resolution: {integrity: sha512-MQonMalbmEshb+amuLtCkVjYliyyWrYXZkiMnHLgFjNEBsNBbZSY3+lYsFK1/VxePSupVkUW6xinqhqB3uHE1g==}
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -1988,11 +1988,11 @@ packages:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
 
-  better-auth@1.2.4:
-    resolution: {integrity: sha512-/ZK2jbUjm8JwdeCLFrUWUBmexPyI9PkaLVXWLWtN60sMDHTY8B5G72wcHglo1QMFBaw4G0qFkP5ayl9k6XfDaA==}
+  better-auth@1.2.5-beta.8:
+    resolution: {integrity: sha512-xqCRC8ufVnMrKfnTzl8v9mRJt8wIaOHIO5c1P5NTYb2rh/KQHUPyZEezOXpq18BrhcQarC2Doojb6f37wBFQjg==}
 
-  better-call@1.0.4:
-    resolution: {integrity: sha512-NdAihYdkS0IOz1mtz8mw1gWacCxR9r921U8YqB+VB6++rt8edMG13vVL16Y4TBL4XkjMK/DUewEsOOFkw9LJYQ==}
+  better-call@1.0.5:
+    resolution: {integrity: sha512-rAT73GWIJ8LbSP8Y3BdJnY1hwAiQPRRmUJ4R3YVhcVGS927l3eTXG5o5TD6Bv6je6ygjdx6iVq3/BU49eGUCHg==}
 
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
@@ -4191,11 +4191,12 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@better-auth/utils@0.2.3':
+  '@better-auth/utils@0.2.4':
     dependencies:
+      typescript: 5.8.2
       uncrypto: 0.1.3
 
-  '@better-fetch/fetch@1.1.15': {}
+  '@better-fetch/fetch@1.1.17': {}
 
   '@drizzle-team/brocli@0.10.2': {}
 
@@ -5630,15 +5631,15 @@ snapshots:
 
   base64id@2.0.0: {}
 
-  better-auth@1.2.4(typescript@5.8.2):
+  better-auth@1.2.5-beta.8(typescript@5.8.2):
     dependencies:
-      '@better-auth/utils': 0.2.3
-      '@better-fetch/fetch': 1.1.15
+      '@better-auth/utils': 0.2.4
+      '@better-fetch/fetch': 1.1.17
       '@noble/ciphers': 0.6.0
       '@noble/hashes': 1.7.1
       '@simplewebauthn/browser': 13.1.0
       '@simplewebauthn/server': 13.1.1
-      better-call: 1.0.4
+      better-call: 1.0.5
       defu: 6.1.4
       jose: 5.10.0
       kysely: 0.27.6
@@ -5648,9 +5649,9 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  better-call@1.0.4:
+  better-call@1.0.5:
     dependencies:
-      '@better-fetch/fetch': 1.1.15
+      '@better-fetch/fetch': 1.1.17
       rou3: 0.5.1
       set-cookie-parser: 2.7.1
       uncrypto: 0.1.3
