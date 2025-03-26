@@ -24,11 +24,12 @@ To run this project, you will need to configure the following environment variab
 
 ### .env.development
 
-| Environment Variable Name | Description                                                   |
-| ------------------------- | ------------------------------------------------------------- |
-| `NEXT_PUBLIC_BASE_URL`    | Override the `.env` value for development.                    |
-| `BETTER_AUTH_URL`         | Override the `.env` value for development.                    |
-| `LOCAL_DNS_RECORD`        | If using a local DNS record for development, specify it here. |
+| Environment Variable Name    | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| `NEXT_PUBLIC_BASE_URL`       | Override the `.env` value for development.                   |
+| `BETTER_AUTH_URL`            | Override the `.env` value for development.                   |
+| `LOCAL_DNS_RECORD`           | Specifies a local DNS record for development, if applicable. |
+| `DISABLE_EMAILS_FOR_TESTING` | Disables email sending during testing.                       |
 
 ### .env.production
 

@@ -6,48 +6,66 @@ import VerifyEmailEmail from "@/components/emails/verify-email";
 import { siteConfig } from "@/config/site";
 import { env } from "@/env";
 import { Resend } from "resend";
+import { ReactElement } from "react";
 
 interface Params {
   identifier: string; // 'to' email address
   url: string;
 }
 
-export async function sendResetPasswordEmail({
-  identifier,
-  url,
-}: Params): Promise<void> {
+interface SendEmailParams {
+  to: string;
+  subject: string;
+  react: ReactElement;
+  errorType: string;
+}
+
+/**
+ * Base function to handle email sending with common logic
+ */
+async function sendEmail({ to, subject, react, errorType }: SendEmailParams): Promise<void> {
+  if (process.env.DISABLE_EMAILS_FOR_TESTING) {
+    console.warn("⚠️ Email sending is disabled by DISABLE_EMAILS_FOR_TESTING");
+    return;
+  }
+
   const resend = new Resend(env.RESEND_API_KEY);
 
   const { error } = await resend.emails.send({
     from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
-    to: identifier,
-    subject: "Reset password instructions",
-    react: PasswordResetEmail({ resetLink: url }),
+    to,
+    subject,
+    react,
   });
 
   if (error) {
     // Propagate the error back to better-auth
-    throw new Error(`Reset password email failed: ${error.message}`);
+    throw new Error(`${errorType} email failed: ${error.message}`);
   }
+}
+
+export async function sendResetPasswordEmail({
+  identifier,
+  url,
+}: Params): Promise<void> {
+  await sendEmail({
+    to: identifier,
+    subject: "Reset password instructions",
+    react: PasswordResetEmail({ resetLink: url }),
+    errorType: "Reset password",
+  });
 }
 
 export async function sendVerificationRequest({
   identifier,
   url,
 }: Params): Promise<void> {
-  const resend = new Resend(env.RESEND_API_KEY);
-
-  const { error } = await resend.emails.send({
-    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+  await sendEmail({
     to: identifier,
-    subject: `Verify your email address`,
+    subject: "Verify your email address",
     react: VerifyEmailEmail({ verifyLink: url }),
+    errorType: "Verification",
   });
-
-  if (error) {
-    // Propagate the error back to better-auth
-    throw new Error(`Verification email failed: ${error.message}`);
-  }
 }
 
 export async function sendChangeEmailVerification({
@@ -55,55 +73,34 @@ export async function sendChangeEmailVerification({
   url,
   newEmail,
 }: Params & { newEmail: string }): Promise<void> {
-  const resend = new Resend(env.RESEND_API_KEY);
-
-  const { error } = await resend.emails.send({
-    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+  await sendEmail({
     to: identifier,
-    subject: `Approve email change`,
+    subject: "Approve email change",
     react: ApproveEmailChange({ approveLink: url, newEmail }),
+    errorType: "Verification",
   });
-
-  if (error) {
-    // Propagate the error back to better-auth
-    throw new Error(`Verification email failed: ${error.message}`);
-  }
 }
 
 export async function sendDeleteAccountVerification({
   identifier,
   url,
 }: Params): Promise<void> {
-  const resend = new Resend(env.RESEND_API_KEY);
-
-  const { error } = await resend.emails.send({
-    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+  await sendEmail({
     to: identifier,
-    subject: `Account Deletion Request`,
+    subject: "Account Deletion Request",
     react: DeleteAccountEmail({ deleteAccountLink: url }),
+    errorType: "Delete account",
   });
-
-  if (error) {
-    // Propagate the error back to better-auth
-    throw new Error(`Delete account email failed: ${error.message}`);
-  }
 }
 
 export async function sendMagicLink({
   identifier,
   url,
 }: Params): Promise<void> {
-  const resend = new Resend(env.RESEND_API_KEY);
-
-  const { error } = await resend.emails.send({
-    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+  await sendEmail({
     to: identifier,
     subject: `Sign in to ${siteConfig.name}`,
     react: MagicLinkEmail({ magicLink: url }),
+    errorType: "Magic link",
   });
-
-  if (error) {
-    // Propagate the error back to better-auth
-    throw new Error(`Magic link email failed: ${error.message}`);
-  }
 }
