@@ -48,15 +48,15 @@ export const EnableMagicLinkAction = async ({
 }: {
   enable: boolean;
 }) => {
+  const sessionObj = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!sessionObj) {
+    return false;
+  }
+
   try {
-    const sessionObj = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!sessionObj) {
-      return false;
-    }
-
     const result = await db
       .update(user)
       .set({ useMagicLink: enable })

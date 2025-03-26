@@ -89,7 +89,7 @@ function PasswordUpdateForm() {
       }
     },
     onSuccess: async (data) => {
-      const original_params = params;
+      const original_params = new URLSearchParams(params.toString());
 
       if (!data.success && data.error) {
         switch (data.error.status) {
@@ -370,6 +370,8 @@ function SetPasswordForm() {
   );
 }
 
+// TODO: Add remove password
+
 interface EnableMagicLinkProps {
   className?: string;
   isMagicLinkEnabled: boolean;
@@ -524,7 +526,7 @@ function ConnectSocialButtons({
         }
       },
       onSuccess: async (data) => {
-        const original_params = params;
+        const original_params = new URLSearchParams(params.toString());
 
         if (!data.success && data.error) {
           switch (data.error.status) {

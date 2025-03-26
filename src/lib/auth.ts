@@ -6,6 +6,7 @@ import { verification } from "@/db/schema/verification";
 import { env } from "@/env";
 import {
   sendChangeEmailVerification,
+  sendDeleteAccountVerification,
   sendMagicLink,
   sendResetPasswordEmail,
   sendVerificationRequest,
@@ -13,6 +14,7 @@ import {
 import { createEnumObject } from "@/lib/utils";
 import { betterAuth, User as User_Original } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin, magicLink } from "better-auth/plugins";
 
@@ -75,6 +77,29 @@ export const auth = betterAuth({
       },
       expirationInSeconds: env.EMAIL_VERIFICATION_EXPIRES_IN_SECONDS,
     },
+    deleteUser: {
+      // TODO: When we have INVALID_TOKEN on token is expired we don't go to the callback URL instead we go to JSON response
+      enabled: true,
+      beforeDelete: async (user: User) => {
+        // This user object is returned from session cookieCache
+        if (user.role == "admin") {
+          // TODO: When we throw we don't go to the callback URL instead we go to JSON response
+          throw new APIError("BAD_REQUEST", {
+            message: "Admin accounts can't be deleted",
+          });
+        }
+      },
+      sendDeleteAccountVerification: async ({
+        user, // The user object
+        url, // The auto-generated URL for deletion
+      }) => {
+        // TODO: Add rate limiting
+        await sendDeleteAccountVerification({
+          identifier: user.email,
+          url,
+        });
+      },
+    },
   },
   account: {
     accountLinking: {
@@ -85,6 +110,7 @@ export const auth = betterAuth({
     },
   },
   session: {
+    freshAge: 60 * 60,
     cookieCache: {
       enabled: true,
       maxAge: 60, // Cache duration in seconds

@@ -73,6 +73,7 @@ export default async function Settings() {
         Session={sessionObj.session}
         SessionsList={sessions}
       />
+      {/*TODO: If account is admin don't show this*/}
       <DeleteAccount />
     </div>
   );

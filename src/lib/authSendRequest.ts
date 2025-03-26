@@ -1,4 +1,5 @@
 import ApproveEmailChange from "@/components/emails/approve-email-change";
+import DeleteAccountEmail from "@/components/emails/delete-account";
 import MagicLinkEmail from "@/components/emails/magic-link";
 import PasswordResetEmail from "@/components/emails/password-reset";
 import VerifyEmailEmail from "@/components/emails/verify-email";
@@ -66,6 +67,25 @@ export async function sendChangeEmailVerification({
   if (error) {
     // Propagate the error back to better-auth
     throw new Error(`Verification email failed: ${error.message}`);
+  }
+}
+
+export async function sendDeleteAccountVerification({
+  identifier,
+  url,
+}: Params): Promise<void> {
+  const resend = new Resend(env.RESEND_API_KEY);
+
+  const { error } = await resend.emails.send({
+    from: `${siteConfig.name} <no-reply@${env.RESEND_DOMAIN}>`,
+    to: identifier,
+    subject: `Account Deletion Request`,
+    react: DeleteAccountEmail({ deleteAccountLink: url }),
+  });
+
+  if (error) {
+    // Propagate the error back to better-auth
+    throw new Error(`Delete account email failed: ${error.message}`);
   }
 }
 
