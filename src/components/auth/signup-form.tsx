@@ -83,6 +83,10 @@ export function SignUpForm({ className }: SignUpFormProps) {
               }
               break;
             }
+            case 429: {
+              setError("Too many requests. Please try again later.");
+              break;
+            }
             default: {
               params.set("error", "Unknown");
               break;

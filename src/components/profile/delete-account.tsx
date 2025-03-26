@@ -83,6 +83,10 @@ export function DeleteAccount() {
             }
             break;
           }
+          case 429: {
+            setError("Too many requests. Please try again later.");
+            break;
+          }
           case 500: {
             if (data.error.statusText === "Internal Server Error") {
               params.set("error", "Configuration");

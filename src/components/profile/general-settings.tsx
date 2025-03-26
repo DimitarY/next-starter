@@ -78,6 +78,10 @@ function ChangeName({ className, user }: { className?: string; user: User }) {
     onSuccess: (data) => {
       if (!data.success && data.error) {
         switch (data.error.status) {
+          case 429: {
+            setError("Too many requests. Please try again later.");
+            break;
+          }
           default: {
             params.set("error", "Unknown");
             break;
@@ -224,6 +228,10 @@ function ChangeEmail({ className, user }: { className?: string; user: User }) {
             }
             break;
           }
+          case 429: {
+            setError("Too many requests. Please try again later.");
+            break;
+          }
           default: {
             params.set("error", "Unknown");
             break;
@@ -357,6 +365,10 @@ function VerifyEmail({ className, user }: { className?: string; user: User }) {
     onSuccess: (data) => {
       if (!data.success && data.error) {
         switch (data.error.status) {
+          case 429: {
+            setError("Too many requests. Please try again later.");
+            break;
+          }
           case 500: {
             if (data.error.statusText === "Internal Server Error") {
               params.set("error", "Configuration");

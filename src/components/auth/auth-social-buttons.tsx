@@ -20,6 +20,7 @@ export function AuthSocialButtons({
 }: AuthSocialButtonsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
   const callbackUrl = searchParams.get("callbackUrl");
 
   const onClick = async (provider: "google" | "github") => {
@@ -29,18 +30,32 @@ export function AuthSocialButtons({
       errorCallbackURL: window.location.href,
     });
 
+    console.log("error", error);
+
     if (error) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (error.status === 403) {
-        params.set("error", "AccessDenied");
-        if (error.code === "INVALID_ORIGIN") {
-          params.set("error", "Configuration");
+      const original_params = new URLSearchParams(params.toString());
+
+      switch (error.status) {
+        case 403: {
+          params.set("error", "AccessDenied");
+          if (error.code === "INVALID_ORIGIN") {
+            params.set("error", "Configuration");
+          }
+          break;
         }
-      } else {
-        params.set("error", "Unknown");
+        case 429: {
+          params.set("error", "TooManyRequests");
+          break;
+        }
+        default: {
+          params.set("error", "Unknown");
+          break;
+        }
       }
 
-      router.push(`?${params.toString()}`);
+      if (original_params.toString() !== params.toString()) {
+        router.replace(`?${params.toString()}`);
+      }
     }
   };
 

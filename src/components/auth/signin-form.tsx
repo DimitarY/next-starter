@@ -47,6 +47,7 @@ function MagicLinkForm({ onShowCredentials }: MagicLinkFormProps) {
       params.delete("error");
 
       setError("");
+      setSuccess("");
 
       router.push(`?${params.toString()}`);
     },
@@ -60,12 +61,15 @@ function MagicLinkForm({ onShowCredentials }: MagicLinkFormProps) {
         } else {
           const { error } = await auth.signIn.magicLink({
             email: form.getValues().email,
-            callbackURL: "/profile", //redirect after successful login (optional)
           });
 
           if (error) {
             console.log("error", error);
             switch (error.status) {
+              case 429: {
+                setError("Too many requests. Please try again later.");
+                break;
+              }
               case 500: {
                 if (error.statusText === "Internal Server Error") {
                   params.set("error", "Configuration");
@@ -211,6 +215,10 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
               } else {
                 params.set("error", "Unknown");
               }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
               break;
             }
             default: {

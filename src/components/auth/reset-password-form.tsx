@@ -48,6 +48,14 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
           return { success: true, error: null };
         }
       },
+      onMutate: () => {
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        params.delete("error");
+
+        setError("");
+
+        router.push(`?${params.toString()}`);
+      },
       onSuccess: (data) => {
         if (!data.success && data.error) {
           switch (data.error.status) {
@@ -57,6 +65,10 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
               } else {
                 params.set("error", "Unknown");
               }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
               break;
             }
             default: {

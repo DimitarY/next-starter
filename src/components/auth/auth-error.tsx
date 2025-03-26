@@ -10,6 +10,7 @@ enum Error {
   AccessDenied = "AccessDenied",
   Verification = "Verification",
   InvalidToken = "INVALID_TOKEN",
+  TooManyRequests = "TooManyRequests",
   Unknown = "Unknown",
 }
 
@@ -41,6 +42,12 @@ const errorMap = {
   ),
   [Error.InvalidToken]: (
     <p>Your link is no longer valid. Please request a new one.</p>
+  ),
+  [Error.TooManyRequests]: (
+    <p>
+      Too many requests. Please try again later or contact support if the
+      problem persists.
+    </p>
   ),
   [Error.Unknown]: (
     <p>
