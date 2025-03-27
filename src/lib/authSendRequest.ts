@@ -24,8 +24,8 @@ interface SendEmailParams {
  * Base function to handle email sending with common logic
  */
 async function sendEmail({ to, subject, react, errorType }: SendEmailParams): Promise<void> {
-  if (process.env.DISABLE_EMAILS_FOR_TESTING) {
-    console.warn("⚠️ Email sending is disabled by DISABLE_EMAILS_FOR_TESTING");
+  if (env.NODE_ENV === "development" && process.env.DISABLE_EMAILS_FOR_TESTING) {
+    console.warn("⚠️ Email sending is disabled by DISABLE_EMAILS_FOR_TESTING in development mode");
     return;
   }
 
