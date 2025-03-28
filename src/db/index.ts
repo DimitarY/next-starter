@@ -1,38 +1,18 @@
-import { account } from "@/db/schema/account";
-import { session } from "@/db/schema/session";
-import { user } from "@/db/schema/user";
-import { verification } from "@/db/schema/verification";
-import { env } from "@/env";
-import { drizzle } from "drizzle-orm/node-postgres";
-import fs from "fs";
-import { Pool } from "pg";
-
 /**
- * Cache the database connection in development. This avoids creating a new connection on every HMR
- * update.
+ * This file exports database connections and schemas for the application.
+ * The actual implementations are in separate files:
+ * - drizzle.ts: PostgreSQL connection using Drizzle ORM
+ * - redis.ts: Redis connection using ioredis
+ *
+ * All database schemas are also exported from here to centralize imports.
  */
-const globalForDb = globalThis as unknown as {
-  conn: Pool | undefined;
-};
 
-/**
- * Dynamically load the database CA certificate at runtime.
- * This prevents build-time failures if the certificate is missing.
- * If the certificate file exists, it is read and used for SSL; otherwise, SSL is disabled.
- */
-const caPath = "./certificates/database_ca.crt";
-const sslConfig = fs.existsSync(caPath)
-  ? { ca: fs.readFileSync(caPath) }
-  : undefined;
+// Database connections
+export { db } from "./drizzle";
+export { redis } from "./redis";
 
-const pool = new Pool({
-  connectionString: env.DATABASE_URL,
-  max: 20,
-  ssl: sslConfig,
-});
-
-if (env.NODE_ENV !== "production") globalForDb.conn = pool;
-
-export const db = drizzle(pool, {
-  schema: { user, session, account, verification },
-});
+// Database schemas
+export { account } from "./schema/account";
+export { session } from "./schema/session";
+export { user } from "./schema/user";
+export { verification } from "./schema/verification";

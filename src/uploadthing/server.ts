@@ -1,5 +1,4 @@
-import { db } from "@/db";
-import { user } from "@/db/schema/user";
+import { db, user } from "@/db";
 import { auth } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";

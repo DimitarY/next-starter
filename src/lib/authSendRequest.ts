@@ -5,8 +5,8 @@ import PasswordResetEmail from "@/components/emails/password-reset";
 import VerifyEmailEmail from "@/components/emails/verify-email";
 import { siteConfig } from "@/config/site";
 import { env } from "@/env";
-import { Resend } from "resend";
 import { ReactElement } from "react";
+import { Resend } from "resend";
 
 interface Params {
   identifier: string; // 'to' email address
@@ -23,9 +23,19 @@ interface SendEmailParams {
 /**
  * Base function to handle email sending with common logic
  */
-async function sendEmail({ to, subject, react, errorType }: SendEmailParams): Promise<void> {
-  if (env.NODE_ENV === "development" && process.env.DISABLE_EMAILS_FOR_TESTING) {
-    console.warn("⚠️ Email sending is disabled by DISABLE_EMAILS_FOR_TESTING in development mode");
+async function sendEmail({
+  to,
+  subject,
+  react,
+  errorType,
+}: SendEmailParams): Promise<void> {
+  if (
+    env.NODE_ENV === "development" &&
+    process.env.DISABLE_EMAILS_FOR_TESTING
+  ) {
+    console.warn(
+      "⚠️ Email sending is disabled by DISABLE_EMAILS_FOR_TESTING in development mode",
+    );
     return;
   }
 

@@ -1,9 +1,4 @@
-import { db } from "@/db";
-import { account } from "@/db/schema/account";
-import { rateLimit } from "@/db/schema/rate_limit";
-import { session } from "@/db/schema/session";
-import { user } from "@/db/schema/user";
-import { verification } from "@/db/schema/verification";
+import { account, db, redis, session, user, verification } from "@/db";
 import { env } from "@/env";
 import {
   sendChangeEmailVerification,
@@ -28,9 +23,21 @@ export const auth = betterAuth({
       session: session,
       account: account,
       verification: verification,
-      rateLimit: rateLimit,
     },
   }),
+  secondaryStorage: {
+    get: async (key) => {
+      const value = await redis.get(key);
+      return value ? value : null;
+    },
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, "EX", ttl);
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+  },
   rateLimit: {
     enabled: true,
     window: 10,
@@ -57,8 +64,7 @@ export const auth = betterAuth({
         max: 2,
       },
     },
-    storage: "database", // This is not optimal for production
-    modelName: "rateLimit",
+    storage: "secondary-storage",
   },
   emailAndPassword: {
     enabled: true,
@@ -135,6 +141,8 @@ export const auth = betterAuth({
   },
   session: {
     freshAge: 60 * 60,
+    storeSessionInDatabase: true,
+    preserveSessionInDatabase: false,
     cookieCache: {
       enabled: true,
       maxAge: 60,

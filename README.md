@@ -12,6 +12,7 @@ To run this project, you will need to configure the following environment variab
 | ---------------------------------- | ------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_BASE_URL`             | The base URL for the application, e.g., `https://localhost:3000`.        |
 | `DATABASE_URL`                     | The connection string for the database.                                  |
+| `REDIS_URL`                        | The connection string for Redis.                                         |
 | `RESEND_API_KEY`                   | API key for the Resend service.                                          |
 | `RESEND_DOMAIN`                    | Domain for the Resend email service.                                     |
 | `BETTER_AUTH_URL`                  | The base URL for BetterAuth, e.g., `https://localhost:3000`.             |
@@ -45,6 +46,7 @@ To run this project, you will need to configure the following environment variab
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_BASE_URL`             | The base URL for production build.                                                                                                                           |
 | `DATABASE_URL`                     | The connection string for the database.                                                                                                                      |
+| `REDIS_URL`                        | The connection string for Redis.                                                                                                                             |
 | `RESEND_API_KEY`                   | API key for the Resend service.                                                                                                                              |
 | `RESEND_DOMAIN`                    | Domain for the Resend email service.                                                                                                                         |
 | `BETTER_AUTH_URL`                  | The base URL for BetterAuth, same as `NEXT_PUBLIC_BASE_URL`.                                                                                                 |

@@ -1,7 +1,6 @@
 "use server";
 
-import { db } from "@/db";
-import { user } from "@/db/schema/user";
+import { db, user } from "@/db";
 import { auth } from "@/lib/auth";
 import { MagicLinkSchema } from "@/schemas/auth";
 import { SecuritySettings_SetPassword } from "@/schemas/settings";

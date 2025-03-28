@@ -9,6 +9,7 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     DATABASE_URL: z.string().url(),
+    REDIS_URL: z.string().url(),
     RESEND_API_KEY: z.string(),
     RESEND_DOMAIN: z.string(),
     BETTER_AUTH_SECRET: z.string(),
