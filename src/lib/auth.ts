@@ -104,6 +104,10 @@ export const auth = betterAuth({
       clientId: env.BETTER_AUTH_GOOGLE_CLIENT_ID,
       clientSecret: env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
     },
+    facebook: {
+      clientId: env.BETTER_AUTH_FACEBOOK_CLIENT_ID,
+      clientSecret: env.BETTER_AUTH_FACEBOOK_CLIENT_SECRET,
+    },
     github: {
       clientId: env.BETTER_AUTH_GITHUB_CLIENT_ID,
       clientSecret: env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
@@ -158,6 +162,9 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: 60,
     },
+  },
+  onAPIError: {
+    errorURL: "/auth/error",
   },
   plugins: [
     passkey({

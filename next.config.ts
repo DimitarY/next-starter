@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
         hostname: "lh3.googleusercontent.com",
         pathname: "/**", // Allow all Google profile images
       },
+      // TODO: Facebook profile image (currently facebook is returning url so we can download the image and save it to our storage)
+      {
+        protocol: "https",
+        hostname: "platform-lookaside.fbsbx.com",
+        pathname: "/platform/profilepic/**",
+      },
       // GitHub profile images
       {
         protocol: "https",

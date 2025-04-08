@@ -16,6 +16,8 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.string().url(),
     BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
     BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+    BETTER_AUTH_FACEBOOK_CLIENT_ID: z.string(),
+    BETTER_AUTH_FACEBOOK_CLIENT_SECRET: z.string(),
     BETTER_AUTH_GITHUB_CLIENT_ID: z.string(),
     BETTER_AUTH_GITHUB_CLIENT_SECRET: z.string(),
     UPLOADTHING_TOKEN: z.string(),

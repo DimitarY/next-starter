@@ -48,7 +48,7 @@ import { AlertCircle, TriangleAlert } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
 import { toast } from "sonner";
@@ -481,7 +481,7 @@ function ConnectSocialButtons({
 
   const { mutate: ConnectAccount, isPending: ConnectAccountIsPending } =
     useMutation({
-      mutationFn: async (provider: "google" | "github") => {
+      mutationFn: async (provider: "google" | "facebook" | "github") => {
         const { error } = await auth.linkSocial({
           provider: provider,
           callbackURL: window.location.href,
@@ -578,7 +578,7 @@ function ConnectSocialButtons({
       },
     });
 
-  const onClick = (provider: "google" | "github") => {
+  const onClick = (provider: "google" | "facebook" | "github") => {
     const account = connectedAccounts.find(
       (account) => account.providerId === provider,
     );
@@ -614,6 +614,19 @@ function ConnectSocialButtons({
           ? "Disconnect from"
           : "Connect with"}{" "}
         Google
+      </Button>
+      <Button
+        size="lg"
+        className="w-full cursor-pointer rounded-md border border-gray-300 bg-[#1877F2] text-white hover:bg-[#166FE5] dark:border-gray-600 dark:bg-[#1877F2] dark:text-white dark:hover:bg-[#166FE5]"
+        variant="link"
+        onClick={() => onClick("facebook")}
+        disabled={ConnectAccountIsPending || DisconnectAccountIsPending}
+      >
+        <FaFacebook className="size-5 text-white" />{" "}
+        {connectedAccounts.some((account) => account.providerId === "facebook")
+          ? "Disconnect from"
+          : "Connect with"}{" "}
+        Facebook
       </Button>
       <Button
         size="lg"
