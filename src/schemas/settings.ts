@@ -21,7 +21,7 @@ export const SecuritySettings_Password = z
       .string()
       .min(1, { message: "Confirm password is required" })
       .trim(),
-    revokeOtherSessions: z.boolean().optional().default(false),
+    revokeOtherSessions: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
     if (data.newPassword !== data.confirmPassword) {
