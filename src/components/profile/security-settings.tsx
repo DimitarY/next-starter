@@ -756,6 +756,8 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
   const [error, setError] = useState<string>("");
+  const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
+  const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
 
   const { mutate: RegisterPasskey, isPending: RegisterPasskeyIsPending } =
     useMutation({
@@ -849,6 +851,8 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
         } else if (!data.success && data.message) {
           setError(data.message);
         } else {
+          setCreateDialogOpen(false);
+          setEditDialogOpen(false);
           router.refresh();
         }
 
@@ -869,27 +873,17 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
       mutationFn: async (
         values: z.infer<typeof SecuritySettings_EditPasskey>,
       ) => {
+        // Check if any other passkey has the same name
         if (passkeys.some((passkey) => passkey.name === values.name)) {
           return {
             success: false,
             error: null,
-            message: "Cannot update a passkey with the same name",
-          };
-        }
-
-        // TODO: value.name is the new name, but we need to get the id of the passkey with the old name
-        const id = passkeys.find((passkey) => passkey.name === values.name)?.id;
-
-        if (!id) {
-          return {
-            success: false,
-            error: null,
-            message: "Cannot update a passkey with the same name",
+            message: "A passkey with this name already exists",
           };
         }
 
         const result = await auth.passkey.updatePasskey({
-          id: id,
+          id: values.id,
           name: values.name,
         });
 
@@ -953,6 +947,8 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
         } else if (!data.success && data.message) {
           setError(data.message);
         } else {
+          setCreateDialogOpen(false);
+          setEditDialogOpen(false);
           router.refresh();
         }
 
@@ -1059,6 +1055,7 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
   const formUpdate = useForm<z.infer<typeof SecuritySettings_EditPasskey>>({
     resolver: zodResolver(SecuritySettings_EditPasskey),
     defaultValues: {
+      id: "",
       name: "",
     },
   });
@@ -1097,13 +1094,38 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
                     </p>
                   </div>
                   <div className="flex flex-row items-center justify-end gap-2">
-                    <Dialog>
+                    <Dialog
+                      modal={false}
+                      open={editDialogOpen}
+                      onOpenChange={(open) => {
+                        setCreateDialogOpen(false);
+                        setEditDialogOpen(open);
+                        if (open) {
+                          formUpdate.setValue("id", passkey.id);
+                          setError("");
+                        }
+                      }}
+                    >
                       <DialogTrigger asChild>
                         <Button variant="secondary" className="cursor-pointer">
                           <Icons.pencil className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
+                      <DialogContent
+                        className="sm:max-w-[425px]"
+                        onPointerDownOutside={(e) => {
+                          // Only prevent closing when interacting with password manager prompts
+                          // Allow clicking outside the dialog for other interactions
+                          if (
+                            e.target &&
+                            (e.target as HTMLElement).closest(
+                              "[data-radix-focus-guard]",
+                            )
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
                         <Form {...formUpdate}>
                           <form
                             onSubmit={formUpdate.handleSubmit(onSubmitUpdate)}
@@ -1171,14 +1193,35 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
           })}
       </div>
       <Separator />
-      <Dialog>
+      <Dialog
+        modal={false}
+        open={createDialogOpen}
+        onOpenChange={(open) => {
+          setCreateDialogOpen(open);
+          setEditDialogOpen(false);
+          if (open) {
+            setError("");
+          }
+        }}
+      >
         <DialogTrigger asChild>
           <Button className="cursor-pointer">
             <Icons.plus /> Create Passkey
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          {/*TODO: We click on browser password manager extension to save the passkey the dialog is closed, but the passkey is saved.*/}
+        <DialogContent
+          className="sm:max-w-[425px]"
+          onPointerDownOutside={(e) => {
+            // Only prevent closing when interacting with password manager prompts
+            // Allow clicking outside the dialog for other interactions
+            if (
+              e.target &&
+              (e.target as HTMLElement).closest("[data-radix-focus-guard]")
+            ) {
+              e.preventDefault();
+            }
+          }}
+        >
           <Form {...formCreate}>
             <form
               onSubmit={formCreate.handleSubmit(onSubmitCreate)}

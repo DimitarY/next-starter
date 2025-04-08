@@ -57,6 +57,7 @@ export const SecuritySettings_CreatePasskey = z.object({
 });
 
 export const SecuritySettings_EditPasskey = z.object({
+  id: z.string(),
   name: z.string().min(1, "Name is required").trim(),
 });
 

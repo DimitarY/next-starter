@@ -32,7 +32,7 @@ export function PasskeySignIn() {
       },
     );
     console.log("result", result);
-  }, []);
+  }, [router]);
 
   return (
     <div className="hidden">
