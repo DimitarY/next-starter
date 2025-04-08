@@ -13,6 +13,7 @@ export { redis } from "./redis";
 
 // Database schemas
 export { account } from "./schema/account";
+export { passkey } from "./schema/passkey";
 export { session } from "./schema/session";
 export { user } from "./schema/user";
 export { verification } from "./schema/verification";

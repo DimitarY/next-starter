@@ -2,6 +2,7 @@
 
 import { EnableMagicLinkAction, SetPasswordAction } from "@/actions/auth";
 import { FormError, FormSuccess } from "@/components/form-message";
+import { Icons } from "@/components/icons";
 import { ModuleWrapper } from "@/components/profile/common";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -26,6 +36,8 @@ import { Separator } from "@/components/ui/separator";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import {
+  SecuritySettings_CreatePasskey,
+  SecuritySettings_EditPasskey,
   SecuritySettings_Password,
   SecuritySettings_SetPassword,
 } from "@/schemas/settings";
@@ -674,7 +686,7 @@ function SessionManagement({
               key={userSession.id}
               className={isCurrentSession ? "border-primary border-2" : ""}
             >
-              <CardContent className="space-y-2 p-4">
+              <CardContent className="space-y-2">
                 <p className="text-sm">
                   <strong>IP Address:</strong> {userSession.ipAddress}
                 </p>
@@ -734,11 +746,493 @@ function SessionManagement({
   );
 }
 
+interface PasskeyManagementProps {
+  className?: string;
+  passkeys: { id: string; name: string; createdAt: string }[];
+}
+
+function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
+  const [error, setError] = useState<string>("");
+
+  const { mutate: RegisterPasskey, isPending: RegisterPasskeyIsPending } =
+    useMutation({
+      mutationFn: async (
+        values: z.infer<typeof SecuritySettings_CreatePasskey>,
+      ) => {
+        if (passkeys.some((passkey) => passkey.name === values.name)) {
+          return {
+            success: false,
+            error: null,
+            message: "Cannot add a passkey with the same name",
+          };
+        }
+
+        const result = await auth.passkey.addPasskey({ name: values.name });
+
+        console.log("result", result);
+
+        if (result?.error) {
+          // TODO: Error code is not defined as type, but it is defined in the API
+          return {
+            success: false,
+            error: result.error as {
+              code?: string | undefined;
+              message?: string | undefined;
+              status: number;
+              statusText: string;
+            },
+          };
+        } else {
+          return { success: true, error: null };
+        }
+      },
+      onMutate: () => {
+        setError("");
+
+        if (params.get("error")) {
+          // eslint-disable-next-line drizzle/enforce-delete-with-where
+          params.delete("error");
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onSuccess: async (data) => {
+        const original_params = new URLSearchParams(params.toString());
+
+        if (!data.success && data.error) {
+          switch (data.error.status) {
+            case 400: {
+              if (
+                data.error.message ===
+                "The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission."
+              ) {
+                setError(
+                  "You have denied the request. Please re-authenticate to perform this action.",
+                );
+              }
+              break;
+            }
+            case 403: {
+              if (data.error.code === "SESSION_IS_NOT_FRESH") {
+                // TODO: Add a session refresh page
+                setError(
+                  "Session is not fresh. Please re-authenticate to perform this action.",
+                );
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
+              break;
+            }
+            case 500: {
+              if (data.error.code === "FAILED_TO_VERIFY_REGISTRATION") {
+                setError(
+                  "Failed to verify registration. Please try again later.",
+                );
+              } else if (data.error.statusText === "Internal Server Error") {
+                params.set("error", "Configuration");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
+        } else if (!data.success && data.message) {
+          setError(data.message);
+        } else {
+          router.refresh();
+        }
+
+        if (original_params.toString() !== params.toString()) {
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onError: () => {
+        setError("An unexpected error occurred. Please try again.");
+      },
+      onSettled: () => {
+        formCreate.reset();
+      },
+    });
+
+  const { mutate: UpdatePasskey, isPending: UpdatePasskeyIsPending } =
+    useMutation({
+      mutationFn: async (
+        values: z.infer<typeof SecuritySettings_EditPasskey>,
+      ) => {
+        if (passkeys.some((passkey) => passkey.name === values.name)) {
+          return {
+            success: false,
+            error: null,
+            message: "Cannot update a passkey with the same name",
+          };
+        }
+
+        // TODO: value.name is the new name, but we need to get the id of the passkey with the old name
+        const id = passkeys.find((passkey) => passkey.name === values.name)?.id;
+
+        if (!id) {
+          return {
+            success: false,
+            error: null,
+            message: "Cannot update a passkey with the same name",
+          };
+        }
+
+        const result = await auth.passkey.updatePasskey({
+          id: id,
+          name: values.name,
+        });
+
+        console.log("result", result);
+
+        if (result?.error) {
+          return {
+            success: false,
+            error: result.error,
+          };
+        } else {
+          return { success: true, error: null };
+        }
+      },
+      onMutate: () => {
+        setError("");
+
+        if (params.get("error")) {
+          // eslint-disable-next-line drizzle/enforce-delete-with-where
+          params.delete("error");
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onSuccess: async (data) => {
+        const original_params = new URLSearchParams(params.toString());
+
+        if (!data.success && data.error) {
+          switch (data.error.status) {
+            case 403: {
+              if (data.error.code === "SESSION_IS_NOT_FRESH") {
+                // TODO: Add a session refresh page
+                setError(
+                  "Session is not fresh. Please re-authenticate to perform this action.",
+                );
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
+              break;
+            }
+            case 500: {
+              if (data.error.code === "FAILED_TO_VERIFY_REGISTRATION") {
+                setError(
+                  "Failed to verify registration. Please try again later.",
+                );
+              } else if (data.error.statusText === "Internal Server Error") {
+                params.set("error", "Configuration");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
+        } else if (!data.success && data.message) {
+          setError(data.message);
+        } else {
+          router.refresh();
+        }
+
+        if (original_params.toString() !== params.toString()) {
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onError: () => {
+        setError("An unexpected error occurred. Please try again.");
+      },
+      onSettled: () => {
+        formUpdate.reset();
+      },
+    });
+
+  const { mutate: DeletePasskey, isPending: DeletePasskeyIsPending } =
+    useMutation({
+      mutationFn: async ({ passkeyId }: { passkeyId: string }) => {
+        const result = await auth.passkey.deletePasskey({ id: passkeyId });
+
+        console.log("result", result);
+
+        if (result?.error) {
+          return {
+            success: false,
+            error: result.error,
+          };
+        } else {
+          return { success: true, error: null };
+        }
+      },
+      onMutate: () => {
+        setError("");
+
+        if (params.get("error")) {
+          // eslint-disable-next-line drizzle/enforce-delete-with-where
+          params.delete("error");
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onSuccess: async (data) => {
+        const original_params = new URLSearchParams(params.toString());
+
+        if (!data.success && data.error) {
+          switch (data.error.status) {
+            case 403: {
+              if (data.error.code === "SESSION_IS_NOT_FRESH") {
+                // TODO: Add a session refresh page
+                setError(
+                  "Session is not fresh. Please re-authenticate to perform this action.",
+                );
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
+              break;
+            }
+            case 500: {
+              if (data.error.code === "FAILED_TO_VERIFY_REGISTRATION") {
+                setError(
+                  "Failed to verify registration. Please try again later.",
+                );
+              } else if (data.error.statusText === "Internal Server Error") {
+                params.set("error", "Configuration");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
+        } else {
+          router.refresh();
+        }
+
+        if (original_params.toString() !== params.toString()) {
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onError: () => {
+        setError("An unexpected error occurred. Please try again.");
+      },
+    });
+
+  const formCreate = useForm<z.infer<typeof SecuritySettings_CreatePasskey>>({
+    resolver: zodResolver(SecuritySettings_CreatePasskey),
+    defaultValues: {
+      name: "",
+    },
+  });
+
+  const onSubmitCreate = async (
+    values: z.infer<typeof SecuritySettings_CreatePasskey>,
+  ) => {
+    RegisterPasskey(values);
+  };
+
+  const formUpdate = useForm<z.infer<typeof SecuritySettings_EditPasskey>>({
+    resolver: zodResolver(SecuritySettings_EditPasskey),
+    defaultValues: {
+      name: "",
+    },
+  });
+
+  const onSubmitUpdate = async (
+    values: z.infer<typeof SecuritySettings_EditPasskey>,
+  ) => {
+    UpdatePasskey(values);
+  };
+
+  return (
+    <div className={cn("flex flex-col gap-6 p-6", className)}>
+      <h2 className="text-xl font-bold">Passkeys</h2>
+      <div className="space-y-4">
+        {(passkeys.length == 0 && (
+          <div className="flex items-center justify-center gap-2">
+            <p>No passkeys found</p>
+          </div>
+        )) ||
+          passkeys.map((passkey) => {
+            const userLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+
+            const formattedCreatedAt = new Date(
+              passkey.createdAt,
+            ).toLocaleString(userLocale);
+
+            return (
+              <Card key={passkey.id} className="boarder-2">
+                <CardContent className="flex flex-row justify-between space-y-2">
+                  <div>
+                    <p className="text-sm">
+                      <strong>Name:</strong> {passkey.name}
+                    </p>
+                    <p className="text-sm">
+                      <strong>Created At:</strong> {formattedCreatedAt}
+                    </p>
+                  </div>
+                  <div className="flex flex-row items-center justify-end gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="secondary" className="cursor-pointer">
+                          <Icons.pencil className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <Form {...formUpdate}>
+                          <form
+                            onSubmit={formUpdate.handleSubmit(onSubmitUpdate)}
+                            className="space-y-4"
+                          >
+                            <DialogHeader>
+                              <DialogTitle>Update Passkey</DialogTitle>
+                              <DialogDescription>
+                                Update the name of the passkey
+                              </DialogDescription>
+                            </DialogHeader>
+                            <FormField
+                              control={formUpdate.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Name</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="text"
+                                      placeholder="My Passkey"
+                                      disabled={UpdatePasskeyIsPending}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormError message={error} />
+                            <DialogFooter>
+                              <Button
+                                variant="default"
+                                className="cursor-pointer"
+                                type="submit"
+                                onClick={() =>
+                                  console.log(
+                                    "form values",
+                                    formUpdate.getValues(),
+                                  )
+                                }
+                                disabled={UpdatePasskeyIsPending}
+                              >
+                                Update
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
+                    <Button
+                      variant="destructive"
+                      className="cursor-pointer"
+                      onClick={() => DeletePasskey({ passkeyId: passkey.id })}
+                      disabled={
+                        UpdatePasskeyIsPending || DeletePasskeyIsPending
+                      }
+                    >
+                      <Icons.thrash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+      </div>
+      <Separator />
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className="cursor-pointer">
+            <Icons.plus /> Create Passkey
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          {/*TODO: We click on browser password manager extension to save the passkey the dialog is closed, but the passkey is saved.*/}
+          <Form {...formCreate}>
+            <form
+              onSubmit={formCreate.handleSubmit(onSubmitCreate)}
+              className="space-y-4"
+            >
+              <DialogHeader>
+                <DialogTitle>Create Passkey</DialogTitle>
+                <DialogDescription>
+                  Create a new passkey to access your account
+                </DialogDescription>
+              </DialogHeader>
+              <FormField
+                control={formCreate.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder="My Passkey"
+                        disabled={RegisterPasskeyIsPending}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormError message={error} />
+              <DialogFooter>
+                <Button
+                  variant="default"
+                  className="cursor-pointer"
+                  type="submit"
+                  disabled={RegisterPasskeyIsPending}
+                >
+                  Create
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 interface SecuritySettingsProps {
   MagicLinkEnable: boolean;
   MagicLinkAllow: boolean;
   UsePassword: boolean;
   Accounts: { accountId: string; providerId: string }[];
+  Passkeys: { id: string; name: string; createdAt: string }[];
   EmailVerified: boolean;
   Session: Session;
   SessionsList: Session[];
@@ -749,6 +1243,7 @@ export function SecuritySettings({
   MagicLinkEnable,
   UsePassword,
   Accounts,
+  Passkeys,
   Session,
   SessionsList,
 }: SecuritySettingsProps) {
@@ -767,6 +1262,7 @@ export function SecuritySettings({
             (UsePassword && <PasswordUpdateForm />) || <SetPasswordForm />}
           <ConnectSocialButtons connectedAccounts={Accounts} />
           <SessionManagement session={Session} sessionsList={SessionsList} />
+          <PasskeyManagement passkeys={Passkeys} />
         </ModuleWrapper>
       </CardContent>
       <CardFooter></CardFooter>

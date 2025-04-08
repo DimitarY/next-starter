@@ -3,7 +3,7 @@ import { DeleteAccount } from "@/components/profile/delete-account";
 import { GeneralSettings } from "@/components/profile/general-settings";
 import { ProfilePictureCard } from "@/components/profile/profile-picture";
 import { SecuritySettings } from "@/components/profile/security-settings";
-import { account, db, user } from "@/db";
+import { account, db, passkey, user } from "@/db";
 import { auth } from "@/lib/auth";
 import { sql } from "drizzle-orm";
 import { eq } from "drizzle-orm/sql";
@@ -27,7 +27,7 @@ export default async function Settings() {
     .select({
       id: user.id,
       emailVerified: user.emailVerified,
-      usePassword: sql<boolean>`bool_or(${account.password} IS NOT NULL)`,
+      usePassword: sql<boolean>`COALESCE(bool_or(${account.password} IS NOT NULL), false)`,
       accounts: sql<{ providerId: string; accountId: string }[]>`
       COALESCE(
         jsonb_agg(DISTINCT jsonb_build_object(
@@ -35,27 +35,34 @@ export default async function Settings() {
           'accountId', ${account.accountId}
         )) FILTER (WHERE ${account.providerId} IS NOT NULL), '[]'::jsonb
       )`,
+      passkeys: sql<{ id: string; name: string; createdAt: string }[]>`
+      COALESCE(
+        jsonb_agg(DISTINCT jsonb_build_object(
+          'id', ${passkey.id},
+          'name', ${passkey.name},
+          'createdAt', ${passkey.createdAt}
+        )) FILTER (WHERE ${passkey.id} IS NOT NULL), '[]'::jsonb
+      )`,
       allowMagicLink: user.allowMagicLink,
       useMagicLink: user.useMagicLink,
     })
     .from(user)
     .leftJoin(account, eq(user.id, account.userId))
+    .leftJoin(passkey, eq(user.id, passkey.userId))
     .where(eq(user.id, sessionObj.user.id))
     .groupBy(
       user.id,
-      user.name,
-      user.image,
-      user.createdAt,
       user.emailVerified,
       user.allowMagicLink,
       user.useMagicLink,
-    );
+    )
+    .then((rows) => rows.at(0) ?? null); // Get the first result or return null if empty
 
-  const allowMagicLink = userSettingsInfo[0].allowMagicLink;
-  const magicLinkEnabled = userSettingsInfo[0].useMagicLink;
-  const usePassword = userSettingsInfo[0].usePassword;
-  const accounts = userSettingsInfo[0].accounts;
-  const emailVerified = userSettingsInfo[0].emailVerified;
+  if (!userSettingsInfo) {
+    // If we get to this point something went horribly wrong
+    console.error("Error fetching user settings");
+    redirect("/");
+  }
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-5">
@@ -63,11 +70,12 @@ export default async function Settings() {
       <ProfilePictureCard user={sessionObj.user} />
       <GeneralSettings user={sessionObj.user} />
       <SecuritySettings
-        MagicLinkEnable={magicLinkEnabled}
-        MagicLinkAllow={allowMagicLink}
-        UsePassword={usePassword}
-        Accounts={accounts}
-        EmailVerified={emailVerified}
+        MagicLinkEnable={userSettingsInfo.useMagicLink}
+        MagicLinkAllow={userSettingsInfo.allowMagicLink}
+        UsePassword={userSettingsInfo.usePassword}
+        Accounts={userSettingsInfo.accounts}
+        Passkeys={userSettingsInfo.passkeys}
+        EmailVerified={userSettingsInfo.emailVerified}
         Session={sessionObj.session}
         SessionsList={sessions}
       />

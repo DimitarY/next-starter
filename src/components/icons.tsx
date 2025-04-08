@@ -9,6 +9,7 @@ import {
   Menu,
   Moon,
   PencilIcon,
+  PlusIcon,
   Settings,
   SunMedium,
   Trash2Icon,
@@ -30,4 +31,5 @@ export const Icons = {
   thrash: Trash2Icon,
   calendar: CalendarIcon,
   pencil: PencilIcon,
+  plus: PlusIcon,
 };

@@ -52,6 +52,14 @@ export const SecuritySettings_EmailVerification = z.object({
     .trim(),
 });
 
+export const SecuritySettings_CreatePasskey = z.object({
+  name: z.string().min(1, "Name is required").trim(),
+});
+
+export const SecuritySettings_EditPasskey = z.object({
+  name: z.string().min(1, "Name is required").trim(),
+});
+
 export const DeleteProfile = z.object({
   accept: z.boolean().default(false).optional(),
 });

@@ -3,6 +3,7 @@
 import { MagicLinkAction } from "@/actions/auth";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
+import { PasskeySignIn } from "@/components/auth/passkey";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { Button } from "@/components/ui/button";
 import {
@@ -391,6 +392,7 @@ export function SignInForm({ className }: SignInFormProps) {
         </Link>
         , and to receive periodic emails with updates.
       </span>
+      <PasskeySignIn />
     </div>
   );
 }

@@ -1,4 +1,13 @@
-import { account, db, redis, session, user, verification } from "@/db";
+import { siteConfig } from "@/config/site";
+import {
+  account,
+  db,
+  passkey as passkeyDb,
+  redis,
+  session,
+  user,
+  verification,
+} from "@/db";
 import { env } from "@/env";
 import {
   sendChangeEmailVerification,
@@ -13,6 +22,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin, magicLink } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
 
 export const auth = betterAuth({
   trustedOrigins: [env.NEXT_PUBLIC_BASE_URL],
@@ -23,6 +33,7 @@ export const auth = betterAuth({
       session: session,
       account: account,
       verification: verification,
+      passkey: passkeyDb,
     },
   }),
   secondaryStorage: {
@@ -149,6 +160,11 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    passkey({
+      rpID: new URL(env.NEXT_PUBLIC_BASE_URL).hostname,
+      rpName: siteConfig.name,
+      origin: env.NEXT_PUBLIC_BASE_URL,
+    }),
     admin({
       defaultRole: "user",
       adminRole: "admin",
