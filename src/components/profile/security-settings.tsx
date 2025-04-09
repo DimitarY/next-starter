@@ -62,6 +62,7 @@ function PasswordUpdateForm() {
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const {
     mutate: server_PasswordUpdateAction,
@@ -160,8 +161,6 @@ function PasswordUpdateForm() {
   useEffect(() => {
     let timer: NodeJS.Timeout | undefined;
 
-    form.reset();
-
     if (error || success) {
       timer = setTimeout(() => {
         setError("");
@@ -171,94 +170,132 @@ function PasswordUpdateForm() {
 
     if (success) {
       router.refresh();
+      setDialogOpen(false);
     }
 
-    // Cleanup both timers
+    // Cleanup timer
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [error, form, router, success]);
+  }, [error, router, success]);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="currentPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Current Password</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="password"
-                  disabled={server_PasswordUpdateIsPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="newPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>New Password</FormLabel>
-              {/*TODO: Add password strength meter*/}
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    {...field}
-                    type={passwordVisible ? "text" : "password"}
-                    disabled={server_PasswordUpdateIsPending}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setPasswordVisible(!passwordVisible)}
-                    className="absolute top-2 right-2 pr-1 text-gray-500"
-                  >
-                    {passwordVisible ? (
-                      <FaEyeSlash className="size-5" />
-                    ) : (
-                      <FaEye className="size-5" />
-                    )}
-                  </button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="password"
-                  disabled={server_PasswordUpdateIsPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormSuccess message={success} />
-        <FormError message={error} />
-        <Button
-          variant="default"
-          className="cursor-pointer"
-          type="submit"
-          disabled={server_PasswordUpdateIsPending}
-        >
-          Update password
-        </Button>
-      </form>
-    </Form>
+    <Dialog
+      modal={false}
+      open={dialogOpen}
+      onOpenChange={(open) => {
+        setDialogOpen(open);
+        if (open) {
+          setError("");
+          setSuccess("");
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="w-full cursor-pointer">Update Password</Button>
+      </DialogTrigger>
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => {
+          // Only prevent closing when interacting with password manager prompts
+          // Allow clicking outside the dialog for other interactions
+          if (
+            e.target &&
+            (e.target as HTMLElement).closest("[data-radix-focus-guard]")
+          ) {
+            e.preventDefault();
+          }
+        }}
+      >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>Update Password</DialogTitle>
+              <DialogDescription>
+                Change your account password
+              </DialogDescription>
+            </DialogHeader>
+            <FormField
+              control={form.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Current Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="password"
+                      disabled={server_PasswordUpdateIsPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Password</FormLabel>
+                  {/*TODO: Add password strength meter*/}
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        {...field}
+                        type={passwordVisible ? "text" : "password"}
+                        disabled={server_PasswordUpdateIsPending}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPasswordVisible(!passwordVisible)}
+                        className="absolute top-2 right-2 pr-1 text-gray-500"
+                      >
+                        {passwordVisible ? (
+                          <FaEyeSlash className="size-5" />
+                        ) : (
+                          <FaEye className="size-5" />
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="password"
+                      disabled={server_PasswordUpdateIsPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormSuccess message={success} />
+            <FormError message={error} />
+            <DialogFooter>
+              <Button
+                variant="default"
+                className="cursor-pointer"
+                type="submit"
+                disabled={server_PasswordUpdateIsPending}
+              >
+                Update password
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -268,6 +305,7 @@ function SetPasswordForm() {
   const params = new URLSearchParams(searchParams.toString());
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const { mutate: server_SetPassword, isPending: server_SetPasswordIsPending } =
     useMutation({
@@ -314,8 +352,6 @@ function SetPasswordForm() {
   useEffect(() => {
     let timer: NodeJS.Timeout | undefined;
 
-    form.reset();
-
     if (error || success) {
       timer = setTimeout(() => {
         setError("");
@@ -325,64 +361,102 @@ function SetPasswordForm() {
 
     if (success) {
       router.refresh();
+      setDialogOpen(false);
     }
 
-    // Cleanup both timers
+    // Cleanup timer
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [error, form, router, success]);
+  }, [error, router, success]);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Set Password</FormLabel>
-              {/*TODO: Add password strength meter*/}
-              <FormControl>
-                <Input
-                  {...field}
-                  type="password"
-                  disabled={server_SetPasswordIsPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="password"
-                  disabled={server_SetPasswordIsPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormSuccess message={success} />
-        <FormError message={error} />
-        <Button
-          variant="default"
-          className="cursor-pointer"
-          type="submit"
-          disabled={server_SetPasswordIsPending}
-        >
-          Set Password
-        </Button>
-      </form>
-    </Form>
+    <Dialog
+      modal={false}
+      open={dialogOpen}
+      onOpenChange={(open) => {
+        setDialogOpen(open);
+        if (open) {
+          setError("");
+          setSuccess("");
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="w-full cursor-pointer">Set Password</Button>
+      </DialogTrigger>
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => {
+          // Only prevent closing when interacting with password manager prompts
+          // Allow clicking outside the dialog for other interactions
+          if (
+            e.target &&
+            (e.target as HTMLElement).closest("[data-radix-focus-guard]")
+          ) {
+            e.preventDefault();
+          }
+        }}
+      >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>Set Password</DialogTitle>
+              <DialogDescription>
+                Create a password for your account
+              </DialogDescription>
+            </DialogHeader>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Set Password</FormLabel>
+                  {/*TODO: Add password strength meter*/}
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="password"
+                      disabled={server_SetPasswordIsPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="password"
+                      disabled={server_SetPasswordIsPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormSuccess message={success} />
+            <FormError message={error} />
+            <DialogFooter>
+              <Button
+                variant="default"
+                className="cursor-pointer"
+                type="submit"
+                disabled={server_SetPasswordIsPending}
+              >
+                Set Password
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -556,6 +630,17 @@ function ConnectSocialButtons({
               }
               break;
             }
+            case 403: {
+              if (data.error.code === "SESSION_IS_NOT_FRESH") {
+                // TODO: Add a session refresh page
+                setError(
+                  "Session is not fresh. Please re-authenticate to perform this action.",
+                );
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
             case 429: {
               setError("Too many requests. Please try again later.");
               break;
@@ -673,8 +758,8 @@ function SessionManagement({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6 p-6", className)}>
-      <h2 className="text-xl font-bold">Active Sessions</h2>
+    <div className={cn("flex flex-col gap-6", className)}>
+      <p className="text-base font-medium">Active Sessions</p>
       <div className="space-y-4">
         {sessionsList.map((userSession) => {
           const parser = new UAParser();
@@ -1080,8 +1165,8 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
   };
 
   return (
-    <div className={cn("flex flex-col gap-6 p-6", className)}>
-      <h2 className="text-xl font-bold">Passkeys</h2>
+    <div className={cn("flex flex-col gap-6", className)}>
+      <p className="text-base font-medium">Passkeys</p>
       <div className="space-y-4">
         {(passkeys.length == 0 && (
           <div className="flex items-center justify-center gap-2">
@@ -1218,7 +1303,7 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
         }}
       >
         <DialogTrigger asChild>
-          <Button className="cursor-pointer">
+          <Button className="w-full cursor-pointer">
             <Icons.plus /> Create Passkey
           </Button>
         </DialogTrigger>
@@ -1311,17 +1396,28 @@ export function SecuritySettings({
       </CardHeader>
       <CardContent>
         <ModuleWrapper>
+          {!(MagicLinkAllow && MagicLinkEnable) && (
+            <div className="flex flex-col gap-6">
+              <p className="text-base font-medium">Password</p>
+              <div className="space-y-4">
+                {UsePassword ? <PasswordUpdateForm /> : <SetPasswordForm />}
+              </div>
+            </div>
+          )}
           {MagicLinkAllow && (
             <EnableMagicLink isMagicLinkEnabled={MagicLinkEnable} />
           )}
-          {(MagicLinkAllow && MagicLinkEnable) ||
-            (UsePassword && <PasswordUpdateForm />) || <SetPasswordForm />}
           <ConnectSocialButtons connectedAccounts={Accounts} />
           <SessionManagement session={Session} sessionsList={SessionsList} />
           <PasskeyManagement passkeys={Passkeys} />
         </ModuleWrapper>
       </CardContent>
-      <CardFooter></CardFooter>
+      <CardFooter className="flex flex-col justify-start gap-2 border-t px-6 py-4 sm:flex-row sm:justify-between">
+        <p className="text-muted-foreground text-sm">
+          Security settings allow you to manage your account security
+          preferences.
+        </p>
+      </CardFooter>{" "}
     </Card>
   );
 }
