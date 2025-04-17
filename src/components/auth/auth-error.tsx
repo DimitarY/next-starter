@@ -8,7 +8,6 @@ enum Error {
   Configuration = "Configuration",
   AccountNotLinked = "account_not_linked",
   AccessDenied = "AccessDenied",
-  Verification = "Verification",
   InvalidToken = "INVALID_TOKEN",
   TooManyRequests = "TooManyRequests",
   Unknown = "Unknown",
@@ -31,13 +30,6 @@ const errorMap = {
     <p>
       You don’t have permission to access this feature. If this was unexpected,
       please contact support for assistance.
-    </p>
-  ),
-  // FIXME: Not implemented
-  [Error.Verification]: (
-    <p>
-      Your verification link is no longer valid. It may have expired or already
-      been used. Please request a new one.
     </p>
   ),
   [Error.InvalidToken]: (

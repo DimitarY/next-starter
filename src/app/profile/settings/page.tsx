@@ -79,8 +79,8 @@ export default async function Settings() {
         Session={sessionObj.session}
         SessionsList={sessions}
       />
-      {/*TODO: If account is admin don't show this*/}
-      <DeleteAccount />
+      {/* Only show delete account option for non-admin users */}
+      {sessionObj.user.role !== "admin" && <DeleteAccount />}
     </div>
   );
 }
