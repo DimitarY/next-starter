@@ -43,7 +43,7 @@ export function DeleteAccount() {
       }
 
       const { error } = await auth.deleteUser({
-        callbackURL: "/goodbye", // TODO: Add a goodbye page
+        callbackURL: "/goodbye",
       });
 
       console.log("error", error);
