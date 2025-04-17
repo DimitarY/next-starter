@@ -24,10 +24,5 @@ export const passkey = pgTable(
     transports: text("transports"),
     createdAt: timestamp("created_at"),
   },
-  (table) => ({
-    uniqueUserCredential: unique("unique_user_name").on(
-      table.userId,
-      table.name,
-    ),
-  }),
+  (table) => [unique("unique_user_name").on(table.userId, table.name)],
 );
