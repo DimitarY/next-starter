@@ -92,6 +92,9 @@ export function ProfilePictureCard(props: { user: User }) {
     isPending: server_RemoveUserImageActionIsPending,
   } = useMutation({
     mutationFn: RemoveUserImageAction,
+    onSuccess: () => {
+      router.refresh();
+    },
     onError: () => {
       // setError("An unexpected error occurred. Please try again.");
     },

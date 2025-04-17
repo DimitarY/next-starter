@@ -1,6 +1,4 @@
-import { db, user } from "@/db";
 import { auth } from "@/lib/auth";
-import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import type { FileRouter } from "uploadthing/next";
 import { createUploadthing } from "uploadthing/next";
@@ -36,15 +34,7 @@ export const uploadRouter = {
 
       return { userId: session.user.id, currentImageKey };
     })
-    .onUploadComplete(async ({ file, metadata }) => {
-      /**
-       * Update the user's image in the database
-       */
-      await db
-        .update(user)
-        .set({ image: file.ufsUrl })
-        .where(eq(user.id, metadata.userId));
-
+    .onUploadComplete(async ({ metadata }) => {
       /**
        * Delete the old image if it exists
        */

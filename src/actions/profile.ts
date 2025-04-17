@@ -11,16 +11,37 @@ import { headers } from "next/headers";
  * and updating the database record
  */
 export async function UpdateUserImageAction(url: string) {
-  // FIXME: Cached session is not updated
-  // await unstable_update({ user: { image: url } });
-  console.log("URL:", url); // REMOVE_ME
+  try {
+    const headersList = await headers();
+
+    const sessionObj = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (!sessionObj) {
+      return;
+    }
+
+    await auth.api.updateUser({
+      headers: headersList,
+      body: {
+        image: url,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting user image:", error);
+    throw error;
+  }
+
   revalidatePath("/", "layout");
 }
 
 export async function RemoveUserImageAction() {
   try {
+    const headersList = await headers();
+
     const sessionObj = await auth.api.getSession({
-      headers: await headers(),
+      headers: headersList,
     });
 
     if (!sessionObj) {
@@ -32,7 +53,7 @@ export async function RemoveUserImageAction() {
     }
 
     await auth.api.updateUser({
-      headers: await headers(),
+      headers: headersList,
       body: {
         image: null,
       },
