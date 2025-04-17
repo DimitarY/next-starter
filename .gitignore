@@ -43,6 +43,7 @@ next-env.d.ts
 
 # IntelliJ IDEA / WebStorm
 .idea/
+.junie/
 *.iml
 
 # VS Code
