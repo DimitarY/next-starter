@@ -8,6 +8,7 @@ export const siteConfig: SiteConfig = {
   url: `${env.NEXT_PUBLIC_BASE_URL}`,
   ogImage: `${process.env.NEXT_PUBLIC_BASE_URL}/og.webp`,
   copyright: "DimitarY",
+  supportEmail: "support@example.com",
   mainNav: [
     {
       title: "Home",

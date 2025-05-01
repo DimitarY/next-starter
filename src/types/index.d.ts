@@ -5,6 +5,7 @@ export type SiteConfig = {
   url: string;
   ogImage: string;
   copyright: string;
+  supportEmail: string;
   mainNav: MainNavItem[];
 };
 

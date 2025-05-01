@@ -42,3 +42,15 @@ export const MagicLinkSchema = z.object({
     .toLowerCase()
     .trim(),
 });
+
+export const Verify2faSchema = z.object({
+  verify2fa: z
+    .string()
+    .min(1, "Two-factor is required")
+    .max(6, "Maximum number exited")
+    .trim(),
+});
+
+export const Recover2faSchema = z.object({
+  backupCode: z.string().min(1, "Two-factor is required").trim(),
+});

@@ -61,6 +61,18 @@ export const SecuritySettings_EditPasskey = z.object({
   name: z.string().min(1, "Name is required").trim(),
 });
 
+export const SecuritySettings_TwoFactorGenerate = z.object({
+  password: z.string().min(1, "Password is required").trim(),
+});
+
+export const SecuritySettings_TwoFactorVerify = z.object({
+  code: z.string().min(6, "Code is required").trim(),
+});
+
+export const SecuritySettings_TwoFactorDelete = z.object({
+  password: z.string().min(1, "Password is required").trim(),
+});
+
 export const DeleteProfile = z.object({
   accept: z.boolean().default(false).optional(),
 });

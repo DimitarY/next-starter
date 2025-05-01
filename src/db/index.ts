@@ -15,5 +15,6 @@ export { redis } from "./redis";
 export { account } from "./schema/account";
 export { passkey } from "./schema/passkey";
 export { session } from "./schema/session";
+export { twoFactor } from "./schema/two_factor";
 export { user } from "./schema/user";
 export { verification } from "./schema/verification";

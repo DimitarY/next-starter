@@ -40,17 +40,21 @@ import {
   SecuritySettings_EditPasskey,
   SecuritySettings_Password,
   SecuritySettings_SetPassword,
+  SecuritySettings_TwoFactorDelete,
+  SecuritySettings_TwoFactorGenerate,
+  SecuritySettings_TwoFactorVerify,
 } from "@/schemas/settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Session } from "better-auth";
 import { AlertCircle, TriangleAlert } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
+import QRCode from "react-qr-code";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 import { z } from "zod";
@@ -131,6 +135,7 @@ function PasswordUpdateForm() {
         setError(data.message);
       } else {
         router.refresh();
+        setDialogOpen(false);
       }
     },
     onError: () => {
@@ -534,6 +539,671 @@ function EnableMagicLink({
         >
           {useMagicLink ? "Disable Magic Link" : "Enable Magic Link"}
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function TwoFactorForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
+  const [success, setSuccess] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [secret, setSecret] = useState<string>("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [setupStep, setSetupStep] = useState<"generate" | "verify" | "backup">(
+    "generate",
+  );
+
+  const { mutate: GenerateTwoFactor, isPending: GenerateTwoFactorIsPending } =
+    useMutation({
+      mutationFn: async (
+        values: z.infer<typeof SecuritySettings_TwoFactorGenerate>,
+      ) => {
+        const result = await auth.twoFactor.enable({
+          password: values.password,
+        });
+
+        console.log(result);
+
+        if (result?.error) {
+          return { success: false, error: result.error };
+        } else {
+          return {
+            success: true,
+            error: null,
+            result: result.data,
+          };
+        }
+      },
+      onMutate: () => {
+        setSuccess("");
+        setError("");
+
+        if (params.get("error")) {
+          // eslint-disable-next-line drizzle/enforce-delete-with-where
+          params.delete("error");
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onSuccess: async (data) => {
+        const original_params = new URLSearchParams(params.toString());
+
+        if (!data.success && data.error) {
+          switch (data.error.status) {
+            case 400: {
+              if (data.error.code === "INVALID_PASSWORD") {
+                setError("Invalid password");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 403: {
+              if (data.error.code === "SESSION_IS_NOT_FRESH") {
+                setError(
+                  "Session is not fresh. Please re-authenticate to perform this action.",
+                );
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
+
+          if (original_params.toString() !== params.toString()) {
+            router.push(`?${params.toString()}`);
+          }
+        } else if (data.success && data.result) {
+          setQrCodeUrl(data.result.totpURI);
+          setSecret(
+            new URL(data.result.totpURI).searchParams.get("secret") || "",
+          );
+          setBackupCodes(data.result.backupCodes);
+          setSetupStep("verify");
+        }
+      },
+      onError: () => {
+        setError("An unexpected error occurred. Please try again.");
+      },
+      onSettled: () => {
+        formGenerate.reset();
+      },
+    });
+
+  const {
+    mutate: VerifyAndEnableTwoFactor,
+    isPending: VerifyAndEnableTwoFactorIsPending,
+  } = useMutation({
+    mutationFn: async (
+      values: z.infer<typeof SecuritySettings_TwoFactorVerify>,
+    ) => {
+      const result = await auth.twoFactor.verifyTotp({
+        code: values.code,
+      });
+
+      if (result?.error) {
+        return { success: false, error: result.error };
+      } else {
+        return { success: true, error: null };
+      }
+    },
+    onMutate: () => {
+      setSuccess("");
+      setError("");
+
+      if (params.get("error")) {
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        params.delete("error");
+        router.push(`?${params.toString()}`);
+      }
+    },
+    onSuccess: async (data) => {
+      const original_params = new URLSearchParams(params.toString());
+
+      if (!data.success && data.error) {
+        switch (data.error.status) {
+          case 400: {
+            if (data.error.code === "INVALID_TWO_FACTOR_AUTHENTICATION") {
+              setError("Invalid verification code. Please try again.");
+            } else {
+              params.set("error", "Unknown");
+            }
+            break;
+          }
+          case 403: {
+            if (data.error.code === "SESSION_IS_NOT_FRESH") {
+              setError(
+                "Session is not fresh. Please re-authenticate to perform this action.",
+              );
+            } else {
+              params.set("error", "Unknown");
+            }
+            break;
+          }
+          case 429: {
+            setError("Too many requests. Please try again later.");
+            break;
+          }
+          default: {
+            params.set("error", "Unknown");
+            break;
+          }
+        }
+
+        if (original_params.toString() !== params.toString()) {
+          router.push(`?${params.toString()}`);
+        }
+      } else {
+        setSuccess("Two-factor authentication has been enabled successfully!");
+
+        // Show backup codes instead of closing dialog
+        setSetupStep("backup");
+      }
+    },
+    onError: () => {
+      setError("An unexpected error occurred. Please try again.");
+    },
+    onSettled: () => {
+      formVerify.reset();
+    },
+  });
+
+  const formGenerate = useForm<
+    z.infer<typeof SecuritySettings_TwoFactorGenerate>
+  >({
+    resolver: zodResolver(SecuritySettings_TwoFactorGenerate),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  const formVerify = useForm<z.infer<typeof SecuritySettings_TwoFactorVerify>>({
+    resolver: zodResolver(SecuritySettings_TwoFactorVerify),
+    defaultValues: {
+      code: "",
+    },
+  });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+
+    if (error || success) {
+      timer = setTimeout(() => {
+        setError("");
+        setSuccess("");
+      }, 5000);
+    }
+
+    // Cleanup timer
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [error, router, success]);
+
+  const wasDialogOpen = useRef(false);
+
+  useEffect(() => {
+    if (wasDialogOpen.current && !dialogOpen) {
+      router.refresh();
+    }
+    wasDialogOpen.current = dialogOpen;
+  }, [dialogOpen, wasDialogOpen, router]);
+
+  const onSubmitGenerate = async (
+    values: z.infer<typeof SecuritySettings_TwoFactorGenerate>,
+  ) => {
+    GenerateTwoFactor(values);
+  };
+
+  const onSubmitVerify = async (
+    values: z.infer<typeof SecuritySettings_TwoFactorVerify>,
+  ) => {
+    VerifyAndEnableTwoFactor(values);
+  };
+
+  return (
+    <Dialog
+      modal={false}
+      open={dialogOpen}
+      onOpenChange={(open) => {
+        setDialogOpen(open);
+        if (open) {
+          setError("");
+          setSuccess("");
+          setSetupStep("generate");
+          setQrCodeUrl("");
+          setSecret("");
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="cursor-pointer">
+          Setup Two-Factor Authentication
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onPointerDownOutside={(e) => {
+          // Only prevent closing when interacting with password manager prompts
+          // Allow clicking outside the dialog for other interactions
+          if (
+            e.target &&
+            (e.target as HTMLElement).closest("[data-radix-focus-guard]")
+          ) {
+            e.preventDefault();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>Two-Factor Authentication</DialogTitle>
+          <DialogDescription>
+            {setupStep === "generate"
+              ? "Set up two-factor authentication for your account"
+              : setupStep === "verify"
+                ? "Verify your authenticator app"
+                : "Save your backup codes"}
+          </DialogDescription>
+        </DialogHeader>
+
+        {setupStep === "generate" ? (
+          <div className="space-y-4">
+            <div className="text-muted-foreground text-sm">
+              <p>
+                Two-factor authentication adds an extra layer of security to
+                your account.
+              </p>
+              <p className="mt-2">
+                You&#39;ll need an authenticator app like Google Authenticator,
+                Authy, or Microsoft Authenticator.
+              </p>
+            </div>
+            <Form {...formGenerate}>
+              <form
+                onSubmit={formGenerate.handleSubmit(onSubmitGenerate)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={formGenerate.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder="Enter you're password"
+                          disabled={GenerateTwoFactorIsPending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormSuccess message={success} />
+                <FormError message={error} />
+                <DialogFooter>
+                  <Button
+                    variant="default"
+                    className="cursor-pointer"
+                    type="submit"
+                    disabled={GenerateTwoFactorIsPending}
+                  >
+                    {GenerateTwoFactorIsPending ? (
+                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    Generate QR Code
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </div>
+        ) : setupStep === "verify" ? (
+          <Form {...formVerify}>
+            <form
+              onSubmit={formVerify.handleSubmit(onSubmitVerify)}
+              className="space-y-4"
+            >
+              {qrCodeUrl && (
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <div className="rounded-md border bg-white p-2">
+                    <QRCode value={qrCodeUrl || ""} />
+                  </div>
+                  <div className="text-center text-sm">
+                    <p>Scan this QR code with your authenticator app</p>
+                    <p className="mt-2 font-mono text-xs">
+                      Or enter this code manually:
+                      <button
+                        className="text-xs font-bold"
+                        onClick={() => {
+                          navigator.clipboard.writeText(secret).then();
+                          toast("Secret copied successful");
+                        }}
+                      >
+                        {secret}
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              )}
+              <FormField
+                control={formVerify.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Verification Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder="Enter 6-digit code"
+                        disabled={VerifyAndEnableTwoFactorIsPending}
+                        maxLength={6}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormSuccess message={success} />
+              <FormError message={error} />
+              <DialogFooter>
+                <Button
+                  variant="default"
+                  className="cursor-pointer"
+                  type="submit"
+                  disabled={VerifyAndEnableTwoFactorIsPending}
+                >
+                  {VerifyAndEnableTwoFactorIsPending ? (
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Verify and Enable
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-muted-foreground text-sm">
+              <p>
+                Two-factor authentication has been enabled successfully! Please
+                save these backup codes in a secure location. You can use these
+                codes to access your account if you lose access to your
+                authenticator app.
+              </p>
+            </div>
+
+            <div className="bg-muted mt-4 rounded-md border p-4">
+              <div className="grid grid-cols-2 gap-2">
+                {backupCodes.map((code, index) => (
+                  <div key={index} className="font-mono text-sm">
+                    {code}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => {
+                  navigator.clipboard.writeText(backupCodes.join("\n")).then();
+                  toast("Success!", {
+                    description: "Backup codes copied to clipboard.",
+                  });
+                }}
+              >
+                <Icons.copy className="mr-2 h-4 w-4" />
+                Copy to Clipboard
+              </Button>
+            </div>
+
+            <FormSuccess message={success} />
+            <FormError message={error} />
+
+            <DialogFooter>
+              <Button
+                variant="default"
+                className="cursor-pointer"
+                onClick={() => {
+                  setDialogOpen(false);
+                  setSetupStep("generate");
+                  setQrCodeUrl("");
+                  setSecret("");
+                }}
+              >
+                Close
+              </Button>
+            </DialogFooter>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TwoFactorStatus({
+  isTwoFactorEnabled,
+}: {
+  isTwoFactorEnabled: boolean;
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
+  const [error, setError] = useState<string>("");
+
+  const { mutate: DisableTwoFactor, isPending: DisableTwoFactorIsPending } =
+    useMutation({
+      mutationFn: async (
+        values: z.infer<typeof SecuritySettings_TwoFactorDelete>,
+      ) => {
+        const result = await auth.twoFactor.disable({
+          password: values.password,
+        });
+
+        console.log("result", result);
+
+        if (result?.error) {
+          return { success: false, error: result.error };
+        } else {
+          return { success: true, error: null };
+        }
+      },
+      onMutate: () => {
+        setError("");
+
+        if (params.get("error")) {
+          // eslint-disable-next-line drizzle/enforce-delete-with-where
+          params.delete("error");
+          router.push(`?${params.toString()}`);
+        }
+      },
+      onSuccess: async (data) => {
+        const original_params = new URLSearchParams(params.toString());
+
+        if (!data.success && data.error) {
+          switch (data.error.status) {
+            case 400: {
+              if (data.error.code === "INVALID_PASSWORD") {
+                setError("Invalid password");
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 403: {
+              if (data.error.code === "SESSION_IS_NOT_FRESH") {
+                // TODO: Add a session refresh page
+                setError(
+                  "Session is not fresh. Please re-authenticate to perform this action.",
+                );
+              } else {
+                params.set("error", "Unknown");
+              }
+              break;
+            }
+            case 429: {
+              setError("Too many requests. Please try again later.");
+              break;
+            }
+            default: {
+              params.set("error", "Unknown");
+              break;
+            }
+          }
+
+          if (original_params.toString() !== params.toString()) {
+            router.push(`?${params.toString()}`);
+          }
+        } else {
+          toast("Success!", {
+            description: "Two-factor authentication has been disabled.",
+          });
+          router.refresh();
+        }
+      },
+      onError: () => {
+        setError("An unexpected error occurred. Please try again.");
+      },
+    });
+
+  const form = useForm<z.infer<typeof SecuritySettings_TwoFactorDelete>>({
+    resolver: zodResolver(SecuritySettings_TwoFactorDelete),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+
+    if (error) {
+      timer = setTimeout(() => {
+        setError("");
+      }, 5000);
+    }
+
+    // Cleanup timer
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [error, router]);
+
+  const onSubmitGenerate = async (
+    values: z.infer<typeof SecuritySettings_TwoFactorDelete>,
+  ) => {
+    DisableTwoFactor(values);
+  };
+
+  return (
+    <div className="flex flex-col justify-center gap-4 p-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-base font-medium">Two-Factor Authentication</p>
+          <p className="text-muted-foreground text-sm">
+            {isTwoFactorEnabled
+              ? "Your account is protected with two-factor authentication."
+              : "Add an extra layer of security to your account with two-factor authentication."}
+          </p>
+        </div>
+        {isTwoFactorEnabled ? (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="cursor-pointer" variant="destructive">
+                {DisableTwoFactorIsPending ? (
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Disable 2FA
+              </Button>
+            </DialogTrigger>
+            <DialogContent
+              className="sm:max-w-[425px]"
+              onPointerDownOutside={(e) => {
+                // Only prevent closing when interacting with password manager prompts
+                // Allow clicking outside the dialog for other interactions
+                if (
+                  e.target &&
+                  (e.target as HTMLElement).closest("[data-radix-focus-guard]")
+                ) {
+                  e.preventDefault();
+                }
+              }}
+            >
+              <DialogHeader>
+                <DialogTitle>Remove Two-Factor Authentication</DialogTitle>
+                <DialogDescription>
+                  Permanently remove you&#39;re Teo-Factor Authentication
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="text-muted-foreground text-sm">
+                  <p>
+                    Two-factor authentication adds an extra layer of security to
+                    your account.
+                  </p>
+                  <p className="mt-2">
+                    You&#39;ll need an authenticator app like Google
+                    Authenticator, Authy, or Microsoft Authenticator.
+                  </p>
+                </div>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmitGenerate)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="password"
+                              placeholder="Enter you're password"
+                              disabled={DisableTwoFactorIsPending}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormError message={error} />
+                    <DialogFooter>
+                      <Button
+                        variant="destructive"
+                        className="cursor-pointer"
+                        type="submit"
+                        disabled={DisableTwoFactorIsPending}
+                      >
+                        {DisableTwoFactorIsPending ? (
+                          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
+                        Disable 2FA
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </div>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <TwoFactorForm />
+        )}
       </div>
     </div>
   );
@@ -1372,6 +2042,7 @@ interface SecuritySettingsProps {
   MagicLinkEnable: boolean;
   MagicLinkAllow: boolean;
   UsePassword: boolean;
+  TwoFactorEnabled: boolean;
   Accounts: { accountId: string; providerId: string }[];
   Passkeys: { id: string; name: string; createdAt: string }[];
   EmailVerified: boolean;
@@ -1383,6 +2054,7 @@ export function SecuritySettings({
   MagicLinkAllow,
   MagicLinkEnable,
   UsePassword,
+  TwoFactorEnabled,
   Accounts,
   Passkeys,
   Session,
@@ -1407,6 +2079,7 @@ export function SecuritySettings({
           {MagicLinkAllow && (
             <EnableMagicLink isMagicLinkEnabled={MagicLinkEnable} />
           )}
+          <TwoFactorStatus isTwoFactorEnabled={TwoFactorEnabled} />
           <ConnectSocialButtons connectedAccounts={Accounts} />
           <SessionManagement session={Session} sessionsList={SessionsList} />
           <PasskeyManagement passkeys={Passkeys} />
@@ -1417,7 +2090,7 @@ export function SecuritySettings({
           Security settings allow you to manage your account security
           preferences.
         </p>
-      </CardFooter>{" "}
+      </CardFooter>
     </Card>
   );
 }

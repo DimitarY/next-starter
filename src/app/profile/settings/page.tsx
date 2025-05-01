@@ -73,6 +73,7 @@ export default async function Settings() {
         MagicLinkEnable={userSettingsInfo.useMagicLink}
         MagicLinkAllow={userSettingsInfo.allowMagicLink}
         UsePassword={userSettingsInfo.usePassword}
+        TwoFactorEnabled={sessionObj.user.twoFactorEnabled as boolean}
         Accounts={userSettingsInfo.accounts}
         Passkeys={userSettingsInfo.passkeys}
         EmailVerified={userSettingsInfo.emailVerified}

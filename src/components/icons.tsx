@@ -2,9 +2,11 @@ import {
   CalendarIcon,
   ChevronRight,
   Command,
+  Copy,
   CropIcon,
   Laptop,
   LayoutDashboard,
+  Loader,
   LogOut,
   Menu,
   Moon,
@@ -32,4 +34,6 @@ export const Icons = {
   calendar: CalendarIcon,
   pencil: PencilIcon,
   plus: PlusIcon,
+  spinner: Loader,
+  copy: Copy,
 };

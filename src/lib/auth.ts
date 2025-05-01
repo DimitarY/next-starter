@@ -5,6 +5,7 @@ import {
   passkey as passkeyDb,
   redis,
   session,
+  twoFactor as twoFactorDb,
   user,
   verification,
 } from "@/db";
@@ -21,10 +22,11 @@ import { betterAuth, User as User_Original } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { admin, magicLink } from "better-auth/plugins";
+import { admin, magicLink, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 
 export const auth = betterAuth({
+  appName: siteConfig.name,
   trustedOrigins: [env.NEXT_PUBLIC_BASE_URL],
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -34,6 +36,7 @@ export const auth = betterAuth({
       account: account,
       verification: verification,
       passkey: passkeyDb,
+      twoFactor: twoFactorDb,
     },
   }),
   secondaryStorage: {
@@ -172,6 +175,7 @@ export const auth = betterAuth({
       rpName: siteConfig.name,
       origin: env.NEXT_PUBLIC_BASE_URL,
     }),
+    twoFactor(),
     admin({
       defaultRole: "user",
       adminRole: "admin",
@@ -193,6 +197,7 @@ export const auth = betterAuth({
 export const UserRole = createEnumObject(["user", "admin"]);
 
 export type User = User_Original & {
+  twoFactorEnabled?: boolean | null;
   role?: string | null;
   banned?: boolean | null;
   banReason?: string | null;
