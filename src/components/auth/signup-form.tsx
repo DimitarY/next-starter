@@ -229,7 +229,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
         </form>
       </Form>
       <div className="mt-1 gap-1 text-center text-sm font-medium">
-        <span>Have an account? </span>
+        <span>Have an account?</span>{" "}
         <Link href="/auth/sign-in" className="underline">
           Sign in
         </Link>

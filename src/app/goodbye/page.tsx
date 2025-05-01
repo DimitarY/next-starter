@@ -11,10 +11,10 @@ export default function GoodbyePage() {
         className="text-primary text-9xl font-bold"
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ 
+        transition={{
           duration: 0.8,
           type: "spring",
-          bounce: 0.4
+          bounce: 0.4,
         }}
       >
         👋
@@ -28,7 +28,7 @@ export default function GoodbyePage() {
         Goodbye!
       </motion.h1>
       <motion.p
-        className="text-muted-foreground mb-8 text-center text-lg max-w-md"
+        className="text-muted-foreground mb-8 max-w-md text-center text-lg"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
@@ -44,41 +44,41 @@ export default function GoodbyePage() {
           <Link href="/">Return Home</Link>
         </Button>
       </motion.div>
-      
+
       {/* Additional animated elements for visual interest */}
-      <motion.div 
+      <motion.div
         className="absolute"
         initial={{ opacity: 0 }}
-        animate={{ 
+        animate={{
           opacity: [0, 1, 0],
           scale: [0.8, 1.2, 0.8],
           x: [-100, 100, -100],
-          y: [-50, 50, -50]
+          y: [-50, 50, -50],
         }}
-        transition={{ 
+        transition={{
           delay: 1,
-          duration: 8, 
+          duration: 8,
           repeat: Infinity,
-          repeatType: "reverse"
+          repeatType: "reverse",
         }}
       >
         <div className="text-primary/20 text-6xl">✨</div>
       </motion.div>
-      
-      <motion.div 
+
+      <motion.div
         className="absolute"
         initial={{ opacity: 0 }}
-        animate={{ 
+        animate={{
           opacity: [0, 1, 0],
           scale: [0.8, 1.2, 0.8],
           x: [100, -100, 100],
-          y: [50, -50, 50]
+          y: [50, -50, 50],
         }}
-        transition={{ 
+        transition={{
           delay: 1.5,
-          duration: 7, 
+          duration: 7,
           repeat: Infinity,
-          repeatType: "reverse"
+          repeatType: "reverse",
         }}
       >
         <div className="text-primary/20 text-6xl">✨</div>

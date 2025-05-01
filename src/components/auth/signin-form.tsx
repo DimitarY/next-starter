@@ -373,7 +373,7 @@ export function SignInForm({ className }: SignInFormProps) {
       )}
       <div className="mt-1 gap-1 text-center text-sm font-medium">
         <div>
-          <span>Don&#39;t have an account? </span>
+          <span>Don&#39;t have an account?</span>{" "}
           <Link href="/auth/sign-up" className="underline">
             Sign up
           </Link>
