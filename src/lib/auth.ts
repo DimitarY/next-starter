@@ -91,6 +91,7 @@ export const auth = betterAuth({
       });
     },
     resetPasswordTokenExpiresIn: env.RESET_PASSWORD_TOKEN_EXPIRES_IN_SECONDS,
+    revokeSessionsOnPasswordReset: true,
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {

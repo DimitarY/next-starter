@@ -14,7 +14,6 @@ export default async function ProfileView({ params }: Props) {
     headers: await headers(),
   });
 
-  // TODO: Update this to work by username when it is implemented
   const resolvedParams = await params;
 
   if (session && session.user.id === resolvedParams.id) {

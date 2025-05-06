@@ -37,7 +37,6 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
         const { error } = await auth.resetPassword({
           newPassword: values.password,
           token: params.get("token") ?? undefined,
-          // TODO: revoke sessions
         });
 
         console.log("error", error);

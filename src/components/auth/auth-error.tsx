@@ -10,6 +10,7 @@ enum Error {
   AccessDenied = "AccessDenied",
   InvalidToken = "INVALID_TOKEN",
   TooManyRequests = "TooManyRequests",
+  TimedOut = "TimedOut",
   Unknown = "Unknown",
 }
 
@@ -41,6 +42,7 @@ const errorMap = {
       problem persists.
     </p>
   ),
+  [Error.TimedOut]: <p>Time expired. Please make a new request.</p>,
   [Error.Unknown]: (
     <p>
       Something went wrong. Please try again or reach out to support if you

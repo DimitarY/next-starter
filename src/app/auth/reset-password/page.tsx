@@ -17,7 +17,6 @@ export default async function ResetPassword({ searchParams }: Props) {
   }
 
   const params = await searchParams;
-  console.log(params);
 
   if (params.error || !params.token) {
     redirect(`/auth/forgot-password/?error=${params.error}`);

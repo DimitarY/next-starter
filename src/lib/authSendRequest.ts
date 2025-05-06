@@ -31,7 +31,7 @@ async function sendEmail({
 }: SendEmailParams): Promise<void> {
   if (
     env.NODE_ENV === "development" &&
-    process.env.DISABLE_EMAILS_FOR_TESTING
+    process.env.DISABLE_EMAILS_FOR_TESTING === "true"
   ) {
     console.warn(
       "⚠️ Email sending is disabled by DISABLE_EMAILS_FOR_TESTING in development mode",

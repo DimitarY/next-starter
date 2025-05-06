@@ -71,8 +71,7 @@ export function Recover2faForm({ className }: Recover2faFormProps) {
           switch (data.error.status) {
             case 401: {
               if (data.error.code === "INVALID_TWO_FACTOR_COOKIE") {
-                // TODO: Update logic to bring the user back to /auth/sign-in
-                setError("Invalid two factor token");
+                params.set("error", "TimedOut");
               } else if (data.error.code === "INVALID_BACKUP_CODE") {
                 setError("Invalid backup code");
               } else {
