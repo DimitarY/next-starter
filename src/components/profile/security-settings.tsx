@@ -32,6 +32,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  PasswordInput,
+  PasswordInputAdornmentToggle,
+  PasswordInputInput,
+} from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
@@ -51,7 +56,7 @@ import { AlertCircle, TriangleAlert } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEye, FaEyeSlash, FaFacebook } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
 import QRCode from "react-qr-code";
@@ -63,9 +68,11 @@ function PasswordUpdateForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [newPasswordVisible, setNewPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const {
@@ -143,7 +150,6 @@ function PasswordUpdateForm() {
     },
     onSettled: () => {
       form.reset();
-      setPasswordVisible(false);
     },
   });
 
@@ -160,6 +166,10 @@ function PasswordUpdateForm() {
   const onSubmit = async (
     values: z.infer<typeof SecuritySettings_Password>,
   ) => {
+    setPasswordVisible(false);
+    setNewPasswordVisible(false);
+    setConfirmPasswordVisible(false);
+
     server_PasswordUpdateAction(values);
   };
 
@@ -226,13 +236,19 @@ function PasswordUpdateForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Current Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      disabled={server_PasswordUpdateIsPending}
-                    />
-                  </FormControl>
+                  <PasswordInput
+                    visible={passwordVisible}
+                    onVisibleChange={setPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}
@@ -244,26 +260,19 @@ function PasswordUpdateForm() {
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   {/*TODO: Add password strength meter*/}
-                  <FormControl>
-                    <div className="relative">
-                      <Input
+                  <PasswordInput
+                    visible={newPasswordVisible}
+                    onVisibleChange={setNewPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="new-password"
+                        placeholder="Confirm Password"
                         {...field}
-                        type={passwordVisible ? "text" : "password"}
-                        disabled={server_PasswordUpdateIsPending}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setPasswordVisible(!passwordVisible)}
-                        className="absolute top-2 right-2 pr-1 text-gray-500"
-                      >
-                        {passwordVisible ? (
-                          <FaEyeSlash className="size-5" />
-                        ) : (
-                          <FaEye className="size-5" />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}
@@ -274,13 +283,19 @@ function PasswordUpdateForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      disabled={server_PasswordUpdateIsPending}
-                    />
-                  </FormControl>
+                  <PasswordInput
+                    visible={confirmPasswordVisible}
+                    onVisibleChange={setConfirmPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}
@@ -308,6 +323,8 @@ function SetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -351,6 +368,9 @@ function SetPasswordForm() {
   const onSubmit = async (
     values: z.infer<typeof SecuritySettings_SetPassword>,
   ) => {
+    setPasswordVisible(false);
+    setConfirmPasswordVisible(false);
+
     server_SetPassword(values);
   };
 
@@ -418,13 +438,19 @@ function SetPasswordForm() {
                 <FormItem>
                   <FormLabel>Set Password</FormLabel>
                   {/*TODO: Add password strength meter*/}
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      disabled={server_SetPasswordIsPending}
-                    />
-                  </FormControl>
+                  <PasswordInput
+                    visible={passwordVisible}
+                    onVisibleChange={setPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="new-password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}
@@ -435,13 +461,19 @@ function SetPasswordForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      disabled={server_SetPasswordIsPending}
-                    />
-                  </FormControl>
+                  <PasswordInput
+                    visible={confirmPasswordVisible}
+                    onVisibleChange={setConfirmPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="new-password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}
@@ -548,6 +580,7 @@ function TwoFactorForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -580,6 +613,7 @@ function TwoFactorForm() {
         }
       },
       onMutate: () => {
+        setPasswordVisible(false);
         setSuccess("");
         setError("");
 
@@ -840,14 +874,19 @@ function TwoFactorForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="Enter you're password"
-                          disabled={GenerateTwoFactorIsPending}
-                        />
-                      </FormControl>
+                      <PasswordInput
+                        visible={passwordVisible}
+                        onVisibleChange={setPasswordVisible}
+                      >
+                        <FormControl>
+                          <PasswordInputInput
+                            autoComplete="password"
+                            placeholder="Confirm Password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <PasswordInputAdornmentToggle />
+                      </PasswordInput>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -1002,6 +1041,7 @@ function TwoFactorStatus({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const params = new URLSearchParams(searchParams.toString());
   const [error, setError] = useState<string>("");
 
@@ -1105,6 +1145,8 @@ function TwoFactorStatus({
   const onSubmitGenerate = async (
     values: z.infer<typeof SecuritySettings_TwoFactorDelete>,
   ) => {
+    setPasswordVisible(false);
+
     DisableTwoFactor(values);
   };
 
@@ -1170,14 +1212,19 @@ function TwoFactorStatus({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="password"
-                              placeholder="Enter you're password"
-                              disabled={DisableTwoFactorIsPending}
-                            />
-                          </FormControl>
+                          <PasswordInput
+                            visible={passwordVisible}
+                            onVisibleChange={setPasswordVisible}
+                          >
+                            <FormControl>
+                              <PasswordInputInput
+                                autoComplete="password"
+                                placeholder="Confirm Password"
+                                {...field}
+                              />
+                            </FormControl>
+                            <PasswordInputAdornmentToggle />
+                          </PasswordInput>
                           <FormMessage />
                         </FormItem>
                       )}

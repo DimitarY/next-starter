@@ -55,7 +55,7 @@ export async function RemoveUserImageAction() {
     await auth.api.updateUser({
       headers: headersList,
       body: {
-        image: null,
+        image: "",
       },
     });
 

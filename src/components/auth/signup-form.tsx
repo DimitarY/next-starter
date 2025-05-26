@@ -13,6 +13,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  PasswordInput,
+  PasswordInputAdornmentToggle,
+  PasswordInputInput,
+} from "@/components/ui/password-input";
 import { siteConfig } from "@/config/site";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
@@ -23,7 +28,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { z } from "zod";
 
 interface SignUpFormProps {
@@ -34,9 +38,10 @@ export function SignUpForm({ className }: SignUpFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const { mutate: RegisterMutation, isPending: RegisterMutationIsPending } =
     useMutation({
@@ -105,7 +110,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
       },
       onSettled: () => {
         form.setValue("password", "");
-        setPasswordVisible(false);
+        form.setValue("confirmPassword", "");
       },
     });
 
@@ -115,10 +120,14 @@ export function SignUpForm({ className }: SignUpFormProps) {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+    setPasswordVisible(false);
+    setConfirmPasswordVisible(false);
+
     RegisterMutation(values);
   };
 
@@ -190,27 +199,43 @@ export function SignUpForm({ className }: SignUpFormProps) {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   {/*TODO: Add password strength meter*/}
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        placeholder="password"
+                  <PasswordInput
+                    visible={passwordVisible}
+                    onVisibleChange={setPasswordVisible}
+                  >
+                    {" "}
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="new-password"
+                        placeholder="Password"
                         {...field}
-                        type={passwordVisible ? "text" : "password"}
-                        disabled={RegisterMutationIsPending}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setPasswordVisible(!passwordVisible)}
-                        className="absolute top-2 right-2 pr-1 text-gray-500"
-                      >
-                        {passwordVisible ? (
-                          <FaEyeSlash className="size-5" />
-                        ) : (
-                          <FaEye className="size-5" />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <PasswordInput
+                    visible={confirmPasswordVisible}
+                    onVisibleChange={setConfirmPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="new-password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}

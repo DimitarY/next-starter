@@ -10,7 +10,11 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  PasswordInput,
+  PasswordInputAdornmentToggle,
+  PasswordInputInput,
+} from "@/components/ui/password-input";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import { ResetPasswordSchema } from "@/schemas/auth";
@@ -29,6 +33,7 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState<string>("");
 
   const { mutate: ResetPassword, isPending: ResetPasswordIsPending } =
@@ -97,6 +102,8 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
   });
 
   const onSubmit = async (values: z.infer<typeof ResetPasswordSchema>) => {
+    setPasswordVisible(false);
+
     ResetPassword(values);
   };
 
@@ -123,14 +130,19 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="password"
-                      {...field}
-                      type="password"
-                      disabled={ResetPasswordIsPending}
-                    />
-                  </FormControl>
+                  <PasswordInput
+                    visible={passwordVisible}
+                    onVisibleChange={setPasswordVisible}
+                  >
+                    <FormControl>
+                      <PasswordInputInput
+                        autoComplete="password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <PasswordInputAdornmentToggle />
+                  </PasswordInput>
                   <FormMessage />
                 </FormItem>
               )}

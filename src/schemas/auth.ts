@@ -10,16 +10,22 @@ export const LoginSchema = z.object({
   password: z.string().min(1, "Password is required").trim(),
 });
 
-export const RegisterSchema = z.object({
-  name: z.string().min(1, "Name is required").trim(),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Invalid email address")
-    .toLowerCase()
-    .trim(),
-  password: z.string().min(1, "Password is required").trim(), // TODO: Add regex validation
-});
+export const RegisterSchema = z
+  .object({
+    name: z.string().min(1, "Name is required").trim(),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Invalid email address")
+      .toLowerCase()
+      .trim(),
+    password: z.string().min(1, "Password is required").trim(),
+    confirmPassword: z.string().min(1, "Confirm password is required").trim(), // TODO: Add regex validation
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // Specify which field the error message should be associated with
+  });
 
 export const ForgotPasswordSchema = z.object({
   email: z

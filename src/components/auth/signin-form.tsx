@@ -15,6 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  PasswordInput,
+  PasswordInputAdornmentToggle,
+  PasswordInputInput,
+} from "@/components/ui/password-input";
 import { siteConfig } from "@/config/site";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
@@ -167,6 +172,7 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState<string>("");
 
   const { mutate: LoginMutation, isPending: LoginMutationIsPending } =
@@ -252,6 +258,8 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
   });
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    setPasswordVisible(false);
+
     LoginMutation(values);
   };
 
@@ -303,14 +311,19 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="password"
-                    {...field}
-                    type="password"
-                    disabled={LoginMutationIsPending}
-                  />
-                </FormControl>
+                <PasswordInput
+                  visible={passwordVisible}
+                  onVisibleChange={setPasswordVisible}
+                >
+                  <FormControl>
+                    <PasswordInputInput
+                      autoComplete="password"
+                      placeholder="Confirm Password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <PasswordInputAdornmentToggle />
+                </PasswordInput>
                 <FormMessage />
               </FormItem>
             )}
