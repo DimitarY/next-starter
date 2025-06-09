@@ -1,3 +1,4 @@
+import { PASSWORD_RULES } from "@/schemas/auth";
 import * as z from "zod";
 
 export const GeneralSettings_ProfileName = z.object({
@@ -16,7 +17,26 @@ export const GeneralSettings_ProfileEmail = z.object({
 export const SecuritySettings_Password = z
   .object({
     currentPassword: z.string().min(1, "Current password is required").trim(),
-    newPassword: z.string().min(1, "New password is required").trim(), // TODO: Add regex validation
+    newPassword: z
+      .string()
+      .min(
+        PASSWORD_RULES.MIN_LENGTH,
+        `Password must be at least ${PASSWORD_RULES.MIN_LENGTH} characters long`,
+      )
+      .max(
+        PASSWORD_RULES.MAX_LENGTH,
+        `Password cannot exceed ${PASSWORD_RULES.MAX_LENGTH} characters`,
+      )
+      .regex(
+        PASSWORD_RULES.HAS_CAPITAL,
+        "Password must include at least one capital letter",
+      )
+      .regex(
+        PASSWORD_RULES.HAS_NUMBER,
+        "Password must include at least one number",
+      )
+      .regex(PASSWORD_RULES.NO_SPACES, "Password cannot contain spaces")
+      .trim(),
     confirmPassword: z
       .string()
       .min(1, { message: "Confirm password is required" })
@@ -35,8 +55,27 @@ export const SecuritySettings_Password = z
 
 export const SecuritySettings_SetPassword = z
   .object({
-    password: z.string().min(1, "Password is required").trim(),
-    confirmPassword: z.string().min(1, "Confirm password is required").trim(), // TODO: Add regex validation
+    password: z
+      .string()
+      .min(
+        PASSWORD_RULES.MIN_LENGTH,
+        `Password must be at least ${PASSWORD_RULES.MIN_LENGTH} characters long`,
+      )
+      .max(
+        PASSWORD_RULES.MAX_LENGTH,
+        `Password cannot exceed ${PASSWORD_RULES.MAX_LENGTH} characters`,
+      )
+      .regex(
+        PASSWORD_RULES.HAS_CAPITAL,
+        "Password must include at least one capital letter",
+      )
+      .regex(
+        PASSWORD_RULES.HAS_NUMBER,
+        "Password must include at least one number",
+      )
+      .regex(PASSWORD_RULES.NO_SPACES, "Password cannot contain spaces")
+      .trim(),
+    confirmPassword: z.string().min(1, "Confirm password is required").trim(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

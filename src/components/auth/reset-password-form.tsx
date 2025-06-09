@@ -3,23 +3,26 @@
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { FormError } from "@/components/form-message";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import {
   PasswordInput,
   PasswordInputAdornmentToggle,
   PasswordInputInput,
 } from "@/components/ui/password-input";
+import { Progress } from "@/components/ui/progress";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import { ResetPasswordSchema } from "@/schemas/auth";
+import {
+  checkPasswordCriteria,
+  getPasswordStrength,
+  getStrengthColorClass,
+  getStrengthLabel,
+  getStrengthTextColorClass,
+} from "@/utils/password-strength";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Check, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -109,6 +112,15 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
 
   const { setFocus } = form;
 
+  // Watch the password field for real-time strength calculation and criteria checking
+  const password = form.watch("password");
+  const passwordStrength = getPasswordStrength(password);
+  const strengthLabel = getStrengthLabel(passwordStrength);
+  const strengthColorClass = getStrengthColorClass(passwordStrength);
+  const strengthTextColorClass = getStrengthTextColorClass(passwordStrength);
+
+  const passwordCriteria = checkPasswordCriteria(password);
+
   // Focus email field when an error is set
   useEffect(() => {
     if (error) {
@@ -143,7 +155,38 @@ export function ResetPasswordForm({ className }: ResetPasswordFormProps) {
                     </FormControl>
                     <PasswordInputAdornmentToggle />
                   </PasswordInput>
-                  <FormMessage />
+                  <div className="mt-2 space-y-1">
+                    <Progress
+                      value={passwordStrength}
+                      className={cn("h-2", strengthColorClass)}
+                    />
+                    <span
+                      className={cn(
+                        "text-xs font-medium",
+                        strengthTextColorClass,
+                      )}
+                    >
+                      {strengthLabel}
+                    </span>
+                  </div>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    {passwordCriteria.map((criterion, index) => (
+                      <li
+                        key={index}
+                        className={cn(
+                          "flex items-center gap-2",
+                          criterion.isValid ? "text-green-500" : "text-red-500",
+                        )}
+                      >
+                        {criterion.isValid ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <X className="h-4 w-4" />
+                        )}
+                        <span>{criterion.label}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </FormItem>
               )}
             />

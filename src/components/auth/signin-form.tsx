@@ -206,7 +206,6 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
         if (!data.success && data.error) {
           switch (data.error.status) {
             case 401: {
-              // TODO: Add message for when user try to login with email, but don't have a credential account
               if (data.error.code === "INVALID_EMAIL_OR_PASSWORD") {
                 setError("Invalid email or password");
               } else {

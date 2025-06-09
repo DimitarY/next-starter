@@ -1,5 +1,13 @@
 import * as z from "zod";
 
+export const PASSWORD_RULES = {
+  MIN_LENGTH: 8,
+  MAX_LENGTH: 20,
+  HAS_CAPITAL: /[A-Z]/,
+  HAS_NUMBER: /\d/,
+  NO_SPACES: /^\S*$/,
+};
+
 export const LoginSchema = z.object({
   email: z
     .string()
@@ -19,12 +27,31 @@ export const RegisterSchema = z
       .email("Invalid email address")
       .toLowerCase()
       .trim(),
-    password: z.string().min(1, "Password is required").trim(),
-    confirmPassword: z.string().min(1, "Confirm password is required").trim(), // TODO: Add regex validation
+    password: z
+      .string()
+      .min(
+        PASSWORD_RULES.MIN_LENGTH,
+        `Password must be at least ${PASSWORD_RULES.MIN_LENGTH} characters long`,
+      )
+      .max(
+        PASSWORD_RULES.MAX_LENGTH,
+        `Password cannot exceed ${PASSWORD_RULES.MAX_LENGTH} characters`,
+      )
+      .regex(
+        PASSWORD_RULES.HAS_CAPITAL,
+        "Password must include at least one capital letter",
+      )
+      .regex(
+        PASSWORD_RULES.HAS_NUMBER,
+        "Password must include at least one number",
+      )
+      .regex(PASSWORD_RULES.NO_SPACES, "Password cannot contain spaces")
+      .trim(),
+    confirmPassword: z.string().min(1, "Confirm password is required").trim(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"], // Specify which field the error message should be associated with
+    path: ["confirmPassword"],
   });
 
 export const ForgotPasswordSchema = z.object({
@@ -37,7 +64,26 @@ export const ForgotPasswordSchema = z.object({
 });
 
 export const ResetPasswordSchema = z.object({
-  password: z.string().min(1, "Password is required").trim(), // TODO: Add regex validation
+  password: z
+    .string()
+    .min(
+      PASSWORD_RULES.MIN_LENGTH,
+      `Password must be at least ${PASSWORD_RULES.MIN_LENGTH} characters long`,
+    )
+    .max(
+      PASSWORD_RULES.MAX_LENGTH,
+      `Password cannot exceed ${PASSWORD_RULES.MAX_LENGTH} characters`,
+    )
+    .regex(
+      PASSWORD_RULES.HAS_CAPITAL,
+      "Password must include at least one capital letter",
+    )
+    .regex(
+      PASSWORD_RULES.HAS_NUMBER,
+      "Password must include at least one number",
+    )
+    .regex(PASSWORD_RULES.NO_SPACES, "Password cannot contain spaces")
+    .trim(),
 });
 
 export const MagicLinkSchema = z.object({
