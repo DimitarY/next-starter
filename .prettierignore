@@ -4,3 +4,4 @@ node_modules
 .next
 certificates
 src/db/migrations/*
+README.md

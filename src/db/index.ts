@@ -2,14 +2,14 @@
  * This file exports database connections and schemas for the application.
  * The actual implementations are in separate files:
  * - drizzle.ts: PostgreSQL connection using Drizzle ORM
- * - redis.ts: Redis connection using ioredis
+ * - valkey.ts: Valkey connection using iovalkey
  *
  * All database schemas are also exported from here to centralize imports.
  */
 
 // Database connections
 export { db } from "./drizzle";
-export { redis } from "./redis";
+export { valkey } from "./valkey";
 
 // Database schemas
 export { account } from "./schema/account";

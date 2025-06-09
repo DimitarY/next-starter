@@ -3,10 +3,10 @@ import {
   account,
   db,
   passkey as passkeyDb,
-  redis,
   session,
   twoFactor as twoFactorDb,
   user,
+  valkey,
   verification,
 } from "@/db";
 import { env } from "@/env";
@@ -41,15 +41,15 @@ export const auth = betterAuth({
   }),
   secondaryStorage: {
     get: async (key) => {
-      const value = await redis.get(key);
+      const value = await valkey.get(key);
       return value ? value : null;
     },
     set: async (key, value, ttl) => {
-      if (ttl) await redis.set(key, value, "EX", ttl);
-      else await redis.set(key, value);
+      if (ttl) await valkey.set(key, value, "EX", ttl);
+      else await valkey.set(key, value);
     },
     delete: async (key) => {
-      await redis.del(key);
+      await valkey.del(key);
     },
   },
   rateLimit: {
