@@ -20,7 +20,7 @@ const globalForDb = globalThis as unknown as {
  * This prevents build-time failures if the certificate is missing.
  * If the certificate file exists, it is read and used for SSL; otherwise, SSL is disabled.
  */
-const caPath = "./certificates/database_ca.crt";
+const caPath = "./certificates/database_ca.*";
 const sslConfig = fs.existsSync(caPath)
   ? { ca: fs.readFileSync(caPath) }
   : undefined;
