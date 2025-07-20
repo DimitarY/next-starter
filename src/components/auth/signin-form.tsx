@@ -6,6 +6,7 @@ import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
 import { PasskeySignIn } from "@/components/auth/passkey";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -183,6 +184,7 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
         const { error } = await auth.signIn.email({
           email: values.email,
           password: values.password,
+          rememberMe: values.rememberMe,
           callbackURL: callbackUrl || "/",
         });
 
@@ -327,6 +329,22 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-y-0 rounded-md">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    className="border-primary cursor-pointer"
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <FormLabel>Remember me</FormLabel>
+              </FormItem>
+            )}
+          />
           <FormError message={error} />
           <Button
             variant="default"
@@ -354,7 +372,7 @@ interface SignInFormProps {
 }
 
 export function SignInForm({ className }: SignInFormProps) {
-  const [credentialLogin, setCredentialsLogin] = useState<boolean>(false);
+  const [credentialLogin, setCredentialsLogin] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
 
   // This function is passed to the MagicLinkForm to update the state when credentials are required

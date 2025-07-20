@@ -16,6 +16,7 @@ export const LoginSchema = z.object({
     .toLowerCase()
     .trim(),
   password: z.string().min(1, "Password is required").trim(),
+  rememberMe: z.boolean().default(false),
 });
 
 export const RegisterSchema = z
