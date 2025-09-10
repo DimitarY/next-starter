@@ -1,5 +1,19 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import type { Session } from "better-auth";
+import { AlertCircle, Check, TriangleAlert, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaFacebook } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { VscGithubAlt } from "react-icons/vsc";
+import QRCode from "react-qr-code";
+import { toast } from "sonner";
+import { UAParser } from "ua-parser-js";
+import type { z } from "zod";
 import { EnableMagicLinkAction, SetPasswordAction } from "@/actions/auth";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { Icons } from "@/components/icons";
@@ -57,20 +71,6 @@ import {
   getStrengthLabel,
   getStrengthTextColorClass,
 } from "@/utils/password-strength";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Session } from "better-auth";
-import { AlertCircle, Check, TriangleAlert, X } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FaFacebook } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import { VscGithubAlt } from "react-icons/vsc";
-import QRCode from "react-qr-code";
-import { toast } from "sonner";
-import { UAParser } from "ua-parser-js";
-import { z } from "zod";
 
 function PasswordUpdateForm() {
   const router = useRouter();
@@ -304,9 +304,9 @@ function PasswordUpdateForm() {
                     </span>
                   </div>
                   <ul className="mt-2 space-y-1 text-sm">
-                    {passwordCriteria.map((criterion, index) => (
+                    {passwordCriteria.map((criterion) => (
                       <li
-                        key={index}
+                        key={criterion.label}
                         className={cn(
                           "flex items-center gap-2",
                           criterion.isValid ? "text-green-500" : "text-red-500",
@@ -521,9 +521,9 @@ function SetPasswordForm() {
                     </span>
                   </div>
                   <ul className="mt-2 space-y-1 text-sm">
-                    {passwordCriteria.map((criterion, index) => (
+                    {passwordCriteria.map((criterion) => (
                       <li
-                        key={index}
+                        key={criterion.label}
                         className={cn(
                           "flex items-center gap-2",
                           criterion.isValid ? "text-green-500" : "text-red-500",
@@ -856,6 +856,7 @@ function TwoFactorForm() {
     },
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   useEffect(() => {
     let timer: NodeJS.Timeout | undefined;
 
@@ -874,6 +875,7 @@ function TwoFactorForm() {
 
   const wasDialogOpen = useRef(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   useEffect(() => {
     if (wasDialogOpen.current && !dialogOpen) {
       router.refresh();
@@ -1016,6 +1018,7 @@ function TwoFactorForm() {
                           navigator.clipboard.writeText(secret).then();
                           toast("Secret copied successful");
                         }}
+                        type="button"
                       >
                         {secret}
                       </button>
@@ -1072,8 +1075,8 @@ function TwoFactorForm() {
 
             <div className="bg-muted mt-4 rounded-md border p-4">
               <div className="grid grid-cols-2 gap-2">
-                {backupCodes.map((code, index) => (
-                  <div key={index} className="font-mono text-sm">
+                {backupCodes.map((code) => (
+                  <div key={code} className="font-mono text-sm">
                     {code}
                   </div>
                 ))}
@@ -1213,6 +1216,7 @@ function TwoFactorStatus({
     },
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   useEffect(() => {
     let timer: NodeJS.Timeout | undefined;
 
@@ -1971,7 +1975,7 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
     <div className={cn("flex flex-col gap-6", className)}>
       <p className="text-base font-medium">Passkeys</p>
       <div className="space-y-4">
-        {(passkeys.length == 0 && (
+        {(passkeys.length === 0 && (
           <div className="flex items-center justify-center gap-2">
             <p>No passkeys found</p>
           </div>

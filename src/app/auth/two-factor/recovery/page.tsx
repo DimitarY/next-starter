@@ -1,8 +1,8 @@
-import { Recover2faForm } from "@/components/auth/recover-2fa-form";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { Recover2faForm } from "@/components/auth/recover-2fa-form";
+import { auth } from "@/lib/auth";
 
 export default async function Signup() {
   const session = await auth.api.getSession({

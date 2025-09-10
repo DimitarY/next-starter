@@ -1,4 +1,3 @@
-import { createEnumObject } from "@/lib/utils";
 import {
   adminClient,
   magicLinkClient,
@@ -6,6 +5,7 @@ import {
   twoFactorClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { createEnumObject } from "@/lib/utils";
 
 export const auth = createAuthClient({
   // Because the auth server is running on the same domain as client, we don't need to specify the baseURL

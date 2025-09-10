@@ -1,7 +1,7 @@
+import { headers } from "next/headers";
 import { MainNavClient } from "@/components/nav/main-nav-client";
 import { auth } from "@/lib/auth";
-import { MainNavItem } from "@/types";
-import { headers } from "next/headers";
+import type { MainNavItem } from "@/types";
 
 interface MainNavProps {
   items: MainNavItem[];

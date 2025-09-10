@@ -15,6 +15,7 @@
       "!.next",
       "!certificates",
       "!src/db/migrations/*",
+      "!src/db/index.ts",
       "!README.md"
     ]
   },
@@ -30,7 +31,10 @@
       "react": "recommended"
     },
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "a11y": {
+        "noLabelWithoutControl": "off"
+      }
     }
   },
   "javascript": {

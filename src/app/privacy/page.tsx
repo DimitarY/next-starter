@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CookieConsentManagePreferences from "@/components/cookie-consent-manage-preferences";
 import {
   Table,
@@ -7,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Link from "next/link";
 
 const cookiesData = [
   {
@@ -126,8 +126,8 @@ export default function PrivacyPolicy() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cookiesData.map((cookie, index) => (
-                <TableRow key={index}>
+              {cookiesData.map((cookie) => (
+                <TableRow key={cookie.name}>
                   <TableCell>{cookie.name}</TableCell>
                   <TableCell>{cookie.type}</TableCell>
                   <TableCell>{cookie.droppedWhen}</TableCell>

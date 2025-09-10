@@ -1,5 +1,5 @@
-import { PASSWORD_RULES } from "@/schemas/auth";
 import * as z from "zod";
+import { PASSWORD_RULES } from "@/schemas/auth";
 
 export const GeneralSettings_ProfileName = z.object({
   name: z.string().min(1, "Name is required").trim(),

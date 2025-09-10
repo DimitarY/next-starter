@@ -1,9 +1,8 @@
-import { SignUpForm } from "@/components/auth/signup-form";
-
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { SignUpForm } from "@/components/auth/signup-form";
+import { auth } from "@/lib/auth";
 
 export default async function Signup() {
   const session = await auth.api.getSession({

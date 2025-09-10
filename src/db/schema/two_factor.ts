@@ -1,5 +1,5 @@
-import { user } from "@/db/schema/user";
 import { pgTable, text } from "drizzle-orm/pg-core";
+import { user } from "@/db/schema/user";
 
 export const twoFactor = pgTable("two_factor", {
   id: text("id").primaryKey(),

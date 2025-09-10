@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+import { Resend } from "resend";
 import ApproveEmailChange from "@/components/emails/approve-email-change";
 import DeleteAccountEmail from "@/components/emails/delete-account";
 import MagicLinkEmail from "@/components/emails/magic-link";
@@ -5,8 +7,6 @@ import PasswordResetEmail from "@/components/emails/password-reset";
 import VerifyEmailEmail from "@/components/emails/verify-email";
 import { siteConfig } from "@/config/site";
 import { env } from "@/env";
-import { ReactElement } from "react";
-import { Resend } from "resend";
 
 interface Params {
   identifier: string; // 'to' email address

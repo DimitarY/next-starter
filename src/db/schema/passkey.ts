@@ -1,4 +1,3 @@
-import { user } from "@/db/schema/user";
 import {
   boolean,
   integer,
@@ -7,6 +6,7 @@ import {
   timestamp,
   unique,
 } from "drizzle-orm/pg-core";
+import { user } from "@/db/schema/user";
 
 export const passkey = pgTable(
   "passkey",

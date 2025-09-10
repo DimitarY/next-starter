@@ -1,5 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Check, X } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
 import { FormError, FormSuccess } from "@/components/form-message";
@@ -30,14 +38,6 @@ import {
   getStrengthLabel,
   getStrengthTextColorClass,
 } from "@/utils/password-strength";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { Check, X } from "lucide-react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 interface SignUpFormProps {
   className?: string;
@@ -245,9 +245,9 @@ export function SignUpForm({ className }: SignUpFormProps) {
                     </span>
                   </div>
                   <ul className="mt-2 space-y-1 text-sm">
-                    {passwordCriteria.map((criterion, index) => (
+                    {passwordCriteria.map((criterion) => (
                       <li
-                        key={index}
+                        key={criterion.label}
                         className={cn(
                           "flex items-center gap-2",
                           criterion.isValid ? "text-green-500" : "text-red-500",

@@ -1,9 +1,9 @@
-import ProfileInfo from "@/components/profile/profile-info";
-import { db, user } from "@/db";
-import { auth } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import ProfileInfo from "@/components/profile/profile-info";
+import { db, user } from "@/db";
+import { auth } from "@/lib/auth";
 
 type Props = {
   params: Promise<{ id: string }>;

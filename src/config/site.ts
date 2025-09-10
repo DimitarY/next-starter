@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { SiteConfig } from "@/types";
+import type { SiteConfig } from "@/types";
 
 export const siteConfig: SiteConfig = {
   name: "Create Next App",

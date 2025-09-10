@@ -1,7 +1,7 @@
-import ProfileInfo from "@/components/profile/profile-info";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import ProfileInfo from "@/components/profile/profile-info";
+import { auth } from "@/lib/auth";
 
 export default async function Settings() {
   const session = await auth.api.getSession({

@@ -1,3 +1,9 @@
+import { betterAuth, type User as User_Original } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
+import { nextCookies } from "better-auth/next-js";
+import { admin, magicLink, twoFactor } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
 import { siteConfig } from "@/config/site";
 import {
   account,
@@ -18,12 +24,6 @@ import {
   sendVerificationRequest,
 } from "@/lib/authSendRequest";
 import { createEnumObject } from "@/lib/utils";
-import { betterAuth, User as User_Original } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError } from "better-auth/api";
-import { nextCookies } from "better-auth/next-js";
-import { admin, magicLink, twoFactor } from "better-auth/plugins";
-import { passkey } from "better-auth/plugins/passkey";
 
 export const auth = betterAuth({
   appName: siteConfig.name,
@@ -135,7 +135,7 @@ export const auth = betterAuth({
       enabled: true,
       beforeDelete: async (user: User) => {
         // This user object is returned from session cookieCache
-        if (user.role == "admin") {
+        if (user.role === "admin") {
           // TODO: When we throw we don't go to the callback URL instead we go to JSON response
           throw new APIError("BAD_REQUEST", {
             message: "Admin accounts can't be deleted",

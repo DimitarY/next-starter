@@ -1,5 +1,7 @@
 "use client";
 
+import type { Session } from "better-auth";
+import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { AccountNav } from "@/components/nav/account-nav";
 import { ModeToggle } from "@/components/theme-switcher";
@@ -26,10 +28,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { User } from "@/lib/auth";
-import { MainNavItem } from "@/types";
-import { Session } from "better-auth";
-import Link from "next/link";
+import type { User } from "@/lib/auth";
+import type { MainNavItem } from "@/types";
 
 interface userSession {
   session: Session;
@@ -66,9 +66,9 @@ function MobileNav({ items, session }: MainNavProps) {
           </SheetClose>
           {items.length ? (
             <div className="grid gap-2 py-6">
-              {items.map((item, index) =>
+              {items.map((item) =>
                 "href" in item ? (
-                  <SheetClose key={index} asChild>
+                  <SheetClose key={item.title} asChild>
                     <Link
                       href={item.href}
                       className="flex w-full items-center py-2 font-semibold"
@@ -77,16 +77,16 @@ function MobileNav({ items, session }: MainNavProps) {
                     </Link>
                   </SheetClose>
                 ) : (
-                  <Collapsible key={index} className="grid gap-4 py-2">
+                  <Collapsible key={item.title} className="grid gap-4 py-2">
                     <CollapsibleTrigger className="flex w-full items-center font-semibold [&[data-state=open]>svg]:rotate-90">
                       {item.title}
                       <Icons.chevronRight className="ml-auto size-5 transition-all" />
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="grid gap-2">
-                        {item.subItems.map((subItem, subIndex) => (
+                        {item.subItems.map((subItem) => (
                           <div
-                            key={subIndex}
+                            key={subItem.title}
                             className="rounded-md border px-4 py-3 font-mono text-sm"
                           >
                             <SheetClose asChild>
@@ -97,7 +97,7 @@ function MobileNav({ items, session }: MainNavProps) {
                                 <div className="text-sm leading-none font-medium group-hover:underline">
                                   {subItem.title}
                                 </div>
-                                {subItem.description != undefined && (
+                                {subItem.description !== undefined && (
                                   <div className="text-muted-foreground line-clamp-2 text-sm leading-snug">
                                     {subItem.description}
                                   </div>
@@ -155,9 +155,9 @@ function DesktopNav({ items, session }: MainNavProps) {
       <NavigationMenu className="hidden lg:flex">
         {items.length ? (
           <NavigationMenuList>
-            {items.map((item, index) =>
+            {items.map((item) =>
               "href" in item ? (
-                <NavigationMenuLink key={index} asChild>
+                <NavigationMenuLink key={item.title} asChild>
                   <Link
                     href={item.href}
                     className="group bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-active:bg-accent/50 data-[state=open]:bg-accent/50 inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-hidden disabled:pointer-events-none disabled:opacity-50"
@@ -166,12 +166,12 @@ function DesktopNav({ items, session }: MainNavProps) {
                   </Link>
                 </NavigationMenuLink>
               ) : (
-                <NavigationMenuItem key={index}>
+                <NavigationMenuItem key={item.title}>
                   <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="grid w-[400px] gap-1 p-2">
-                      {item.subItems.map((subItem, subIndex) => (
-                        <NavigationMenuLink key={subIndex} asChild>
+                      {item.subItems.map((subItem) => (
+                        <NavigationMenuLink key={subItem.title} asChild>
                           <Link
                             href={subItem.href}
                             className="group bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-active:bg-accent/50 data-[state=open]:bg-accent/50 grid h-auto w-full items-center justify-start gap-1 rounded-md p-4 text-sm font-medium transition-colors focus:outline-hidden disabled:pointer-events-none disabled:opacity-50"
@@ -179,7 +179,7 @@ function DesktopNav({ items, session }: MainNavProps) {
                             <div className="text-sm leading-none font-medium group-hover:underline">
                               {subItem.title}
                             </div>
-                            {subItem.description != undefined && (
+                            {subItem.description !== undefined && (
                               <div className="text-muted-foreground line-clamp-2 text-sm leading-snug">
                                 {subItem.description}
                               </div>

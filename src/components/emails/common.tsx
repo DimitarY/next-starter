@@ -1,6 +1,6 @@
-import { siteConfig } from "@/config/site";
 import { Img, Link, Section, Tailwind, Text } from "@react-email/components";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
+import { siteConfig } from "@/config/site";
 
 interface MyTailwindProps {
   children: ReactNode;

@@ -1,12 +1,12 @@
 "use server";
 
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import type { z } from "zod";
 import { db, user } from "@/db";
 import { auth } from "@/lib/auth";
 import { MagicLinkSchema } from "@/schemas/auth";
 import { SecuritySettings_SetPassword } from "@/schemas/settings";
-import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
-import { z } from "zod";
 
 export const SetPasswordAction = async (
   values: z.infer<typeof SecuritySettings_SetPassword>,

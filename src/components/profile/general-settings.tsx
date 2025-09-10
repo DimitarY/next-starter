@@ -1,5 +1,14 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import type { User } from "better-auth/types";
+import { CircleCheckBig, TriangleAlert } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import type { z } from "zod";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { ModuleWrapper } from "@/components/profile/common";
 import { Button } from "@/components/ui/button";
@@ -26,15 +35,6 @@ import {
   GeneralSettings_ProfileName,
   SecuritySettings_EmailVerification,
 } from "@/schemas/settings";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { User } from "better-auth/types";
-import { CircleCheckBig, TriangleAlert } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
 
 function ChangeName({ className, user }: { className?: string; user: User }) {
   const router = useRouter();

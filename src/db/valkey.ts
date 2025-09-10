@@ -1,5 +1,5 @@
-import { env } from "@/env";
 import Valkey from "iovalkey";
+import { env } from "@/env";
 
 /**
  * Cache the Valkey connection in development. This avoids creating a new connection on every HMR

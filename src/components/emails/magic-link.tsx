@@ -1,12 +1,4 @@
 import {
-  Footer,
-  Header,
-  MyTailwind,
-  TimeRemaining,
-} from "@/components/emails/common";
-import { siteConfig } from "@/config/site";
-import { env } from "@/env";
-import {
   Body,
   Button,
   Head,
@@ -16,6 +8,14 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import {
+  Footer,
+  Header,
+  MyTailwind,
+  TimeRemaining,
+} from "@/components/emails/common";
+import { siteConfig } from "@/config/site";
+import { env } from "@/env";
 
 interface MagicLinkEmailProps {
   magicLink: string;

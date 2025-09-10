@@ -1,7 +1,7 @@
 "use client";
 
-import { ThemeProviderProps } from "next-themes";
 import dynamic from "next/dynamic";
+import type { ThemeProviderProps } from "next-themes";
 
 // Temporary fix for https://github.com/shadcn-ui/ui/issues/5552
 const NextThemesProvider = dynamic(

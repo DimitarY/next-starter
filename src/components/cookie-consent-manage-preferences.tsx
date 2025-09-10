@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,14 +11,12 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { siteConfig } from "@/config/site";
 import {
-  ConsentKey,
+  type ConsentKey,
   consentList,
   getConsentDescription,
   getConsentName,
   getLearnMoreLink,
 } from "@/utils/cookie-consent";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
 
 export default function CookieConsentManagePreferences() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -56,6 +56,7 @@ export default function CookieConsentManagePreferences() {
   );
 
   // Effect hook to load from localStorage when dialog opens
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <getConsentFromLocalStorage changes on every re-render and should not be used as a hook dependency>
   useEffect(() => {
     if (isDialogOpen) {
       const updatedConsentStates: Record<ConsentKey, boolean> =
@@ -86,7 +87,10 @@ export default function CookieConsentManagePreferences() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
-        <button className="cursor-pointer text-blue-500 underline dark:text-blue-400">
+        <button
+          className="cursor-pointer text-blue-500 underline dark:text-blue-400"
+          type="button"
+        >
           Manage preferences
         </button>
       </DialogTrigger>

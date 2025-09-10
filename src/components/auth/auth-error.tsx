@@ -1,9 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { cn } from "@/lib/utils";
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: <>
 enum Error {
   Configuration = "Configuration",
   AccountNotLinked = "account_not_linked",

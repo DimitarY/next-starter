@@ -7,11 +7,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
 import "@/styles/globals.css";
-import { uploadRouter } from "@/uploadthing/server";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import type { Metadata } from "next";
-import React from "react";
+import type React from "react";
 import { extractRouterConfig } from "uploadthing/server";
+import { uploadRouter } from "@/uploadthing/server";
 
 export const metadata: Metadata = {
   title: {

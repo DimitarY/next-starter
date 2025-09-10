@@ -1,7 +1,7 @@
-import { ResetPasswordForm } from "@/components/auth/reset-password-form";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { auth } from "@/lib/auth";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

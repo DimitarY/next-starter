@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/client/auth";
-import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubAlt } from "react-icons/vsc";
+import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/client/auth";
+import { cn } from "@/lib/utils";
 
 interface AuthSocialButtonsProps {
   className?: string;

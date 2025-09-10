@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { consentList } from "@/utils/cookie-consent";
 import { CookieIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { consentList } from "@/utils/cookie-consent";
 
 // Utility function to set local storage values
 const setConsentStatus = (keys: string[], value: string) => {

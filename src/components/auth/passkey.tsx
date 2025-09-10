@@ -1,8 +1,8 @@
 "use client";
 
-import { auth } from "@/lib/client/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { auth } from "@/lib/client/auth";
 
 export function PasskeySignIn() {
   const router = useRouter();

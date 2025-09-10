@@ -1,5 +1,7 @@
 "use client";
 
+import type { Session } from "better-auth";
+import Link from "next/link";
 import { Icons } from "@/components/icons";
 import SignOutDropdownMenuItem from "@/components/nav/sign-out-dropdown-menu-item";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,10 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SheetClose } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { User } from "@/lib/auth";
+import type { User } from "@/lib/auth";
 import { UserRoleClient } from "@/lib/client/auth";
-import { Session } from "better-auth";
-import Link from "next/link";
 
 interface userSession {
   session: Session;

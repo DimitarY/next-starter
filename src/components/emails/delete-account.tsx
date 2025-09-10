@@ -1,5 +1,3 @@
-import { Footer, Header, MyTailwind } from "@/components/emails/common";
-import { siteConfig } from "@/config/site";
 import {
   Body,
   Button,
@@ -10,6 +8,8 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { Footer, Header, MyTailwind } from "@/components/emails/common";
+import { siteConfig } from "@/config/site";
 
 interface DeleteAccountEmailProps {
   deleteAccountLink: string;

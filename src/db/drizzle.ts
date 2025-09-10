@@ -1,11 +1,11 @@
+import fs from "node:fs";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import { account } from "@/db/schema/account";
 import { session } from "@/db/schema/session";
 import { user } from "@/db/schema/user";
 import { verification } from "@/db/schema/verification";
 import { env } from "@/env";
-import { drizzle } from "drizzle-orm/node-postgres";
-import fs from "fs";
-import { Pool } from "pg";
 
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR

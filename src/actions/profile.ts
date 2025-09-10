@@ -1,9 +1,9 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { utapi } from "@/uploadthing/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { utapi } from "@/uploadthing/server";
 
 /**
  * Used to optimistically update the user's image

@@ -1,5 +1,11 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { FormError, FormSuccess } from "@/components/form-message";
 import { Button } from "@/components/ui/button";
@@ -14,12 +20,6 @@ import { Input } from "@/components/ui/input";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
 import { ForgotPasswordSchema } from "@/schemas/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 interface ForgotPasswordFormProps {
   className?: string;

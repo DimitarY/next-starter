@@ -1,3 +1,7 @@
+import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm/sql";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { AuthErrorMessage } from "@/components/auth/auth-error";
 import { DeleteAccount } from "@/components/profile/delete-account";
 import { GeneralSettings } from "@/components/profile/general-settings";
@@ -5,10 +9,6 @@ import { ProfilePictureCard } from "@/components/profile/profile-picture";
 import { SecuritySettings } from "@/components/profile/security-settings";
 import { account, db, passkey, user } from "@/db";
 import { auth } from "@/lib/auth";
-import { sql } from "drizzle-orm";
-import { eq } from "drizzle-orm/sql";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export default async function Settings() {
   const sessionObj = await auth.api.getSession({

@@ -1,10 +1,10 @@
+import type { User } from "better-auth/types";
+import Image from "next/image";
+import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn, formatDate } from "@/lib/utils";
-import { User } from "better-auth/types";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function ProfileInfo(props: {
   className?: string;

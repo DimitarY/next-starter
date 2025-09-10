@@ -1,5 +1,16 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
+import type { User } from "better-auth/types";
+import { ImageIcon, Loader2, XIcon } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import type { Area, Point } from "react-easy-crop";
+import Cropper from "react-easy-crop";
+import { toast } from "sonner";
+import { generateMimeTypes } from "uploadthing/client";
+import type { ExpandedRouteConfig } from "uploadthing/types";
 import {
   RemoveUserImageAction,
   UpdateUserImageAction,
@@ -16,17 +27,6 @@ import {
 } from "@/components/ui/card";
 import { useUploadThing } from "@/uploadthing/client";
 import { invariant } from "@/utils";
-import { useMutation } from "@tanstack/react-query";
-import { User } from "better-auth/types";
-import { ImageIcon, Loader2, XIcon } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import type { Area, Point } from "react-easy-crop";
-import Cropper from "react-easy-crop";
-import { toast } from "sonner";
-import { generateMimeTypes } from "uploadthing/client";
-import type { ExpandedRouteConfig } from "uploadthing/types";
 
 type FileWithPreview = File & { preview: string };
 
@@ -234,7 +234,9 @@ function waitForImageToLoad(src: string) {
       if (attempt++ >= maxAttempts) {
         reject(new Error("Failed to load image"));
       }
-      setTimeout(() => (image.src = src), 250);
+      setTimeout(() => {
+        image.src = src;
+      }, 250);
     };
   });
 }
@@ -295,10 +297,11 @@ const cropAndScaleImage = async (
 ) => {
   const image = new window.Image();
   image.src = imageFile.preview;
-  await new Promise((resolve) => (image.onload = resolve));
-
+  await new Promise((resolve) => {
+    image.onload = resolve;
+  });
   /**
-   * First, lets crop the image to the desired area.
+   * First, let's crop the image to the desired area.
    */
   const cropCanvas = document.createElement("canvas");
   const ctx = cropCanvas.getContext("2d");
