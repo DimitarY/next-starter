@@ -2,11 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
     paths-ignore:
       - ".gitignore"
-      - ".prettierignore"
-      - ".prettierrc"
       - ".github/ISSUE_TEMPLATE/**"
       - "public/**"
       - "LICENSE"
