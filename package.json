@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "dotenv -e .env.development -- sh -c 'next dev --turbopack --experimental-https ${LOCAL_DNS_RECORD:+--hostname $LOCAL_DNS_RECORD}'",
     "dev:email": "cp .env ./node_modules/react-email/dist/preview && email dev --port 5000 --dir src/components/emails",
-    "build": "next build",
+    "build": "next build --turbopack",
     "build:container": "cross-env SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js",
@@ -87,8 +87,6 @@
     "dotenv-cli": "^8.0.0",
     "drizzle-kit": "^0.30.5",
     "postcss": "^8.5.6",
-    "prettier-plugin-organize-imports": "^4.2.0",
-    "prettier-plugin-tailwindcss": "^0.6.14",
     "react-email": "^4.2.11",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2"
