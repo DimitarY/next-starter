@@ -372,7 +372,7 @@ interface SignInFormProps {
 }
 
 export function SignInForm({ className }: SignInFormProps) {
-  const [credentialLogin, setCredentialsLogin] = useState<boolean>(true);
+  const [credentialLogin, setCredentialsLogin] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
 
   // This function is passed to the MagicLinkForm to update the state when credentials are required
@@ -390,6 +390,7 @@ export function SignInForm({ className }: SignInFormProps) {
       <Suspense>
         <AuthSocialButtons />
       </Suspense>
+      <PasskeySignIn />
       <div className="mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:grow before:bg-stone-400 after:ml-4 after:block after:h-px after:grow after:bg-stone-400">
         or
       </div>
@@ -422,7 +423,6 @@ export function SignInForm({ className }: SignInFormProps) {
         </Link>
         , and to receive periodic emails with updates.
       </span>
-      <PasskeySignIn />
     </div>
   );
 }

@@ -17,12 +17,13 @@ export const passkey = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    credentialID: text("credential_i_d").notNull(),
+    credentialID: text("credential_id").notNull(),
     counter: integer("counter").notNull(),
     deviceType: text("device_type").notNull(),
     backedUp: boolean("backed_up").notNull(),
     transports: text("transports"),
     createdAt: timestamp("created_at"),
+    aaguid: text("aaguid"),
   },
   (table) => [unique("unique_user_name").on(table.userId, table.name)],
 );
