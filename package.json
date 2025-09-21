@@ -10,7 +10,7 @@
   "packageManager": "pnpm@10.15.1",
   "scripts": {
     "dev": "dotenv -e .env.development -- sh -c 'next dev --turbopack --experimental-https ${LOCAL_DNS_RECORD:+--hostname $LOCAL_DNS_RECORD}'",
-    "dev:email": "cp .env ./node_modules/react-email/dist/preview && email dev --port 5000 --dir src/components/emails",
+    "dev:email": "cp .env ./node_modules/@react-email/preview-server/. && email dev --port 5000 --dir src/components/emails",
     "build": "next build --turbopack",
     "build:container": "cross-env SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
@@ -77,6 +77,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
+    "@react-email/preview-server": "4.2.11",
     "@tailwindcss/postcss": "^4.1.13",
     "@tanstack/react-query-devtools": "^5.87.4",
     "@types/bcrypt": "^5.0.2",
