@@ -21,42 +21,37 @@ import {
 export default function CookieConsentManagePreferences() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  // Function to handle dialog open changes
-  const handleDialogOpenChange = (isOpen: boolean): void => {
-    setIsDialogOpen(isOpen);
-  };
-
-  // Function to safely get consent from localStorage
-  const getConsentFromLocalStorage = (key: ConsentKey): boolean => {
-    const storedConsent = localStorage.getItem(key);
-    console.log("storedConsent:", storedConsent);
-
-    // Validate the stored value, ensuring it is one of the recognized representations of a boolean
-    if (storedConsent === "true" || storedConsent === "1") {
-      return true;
-    } else if (storedConsent === "false" || storedConsent === "0") {
-      return false;
-    }
-
-    // If the value is not recognized, default to false
-    return false;
-  };
-
-  // Initialize state for each consent key with values from localStorage (if available)
+  // Initialize state with default "false" values to prevent server-side errors
   const [consentStates, setConsentStates] = useState<
     Record<ConsentKey, boolean>
   >(
     consentList.reduce(
       (acc, key) => {
-        acc[key] = getConsentFromLocalStorage(key); // Use the function to fetch the consent value
+        acc[key] = false; // Default to false on server
         return acc;
       },
       {} as Record<ConsentKey, boolean>,
     ),
   );
 
+  // Function to safely get consent from localStorage (now only called on the client)
+  const getConsentFromLocalStorage = (key: ConsentKey): boolean => {
+    // Check if window is defined to ensure this code runs in the browser
+    if (typeof window !== "undefined") {
+      const storedConsent = localStorage.getItem(key);
+      // Simplify boolean validation
+      return storedConsent === "true";
+    }
+    return false; // Return false for the server-side
+  };
+
+  // Function to handle dialog open changes
+  const handleDialogOpenChange = (isOpen: boolean): void => {
+    setIsDialogOpen(isOpen);
+  };
+
   // Effect hook to load from localStorage when dialog opens
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <getConsentFromLocalStorage changes on every re-render and should not be used as a hook dependency>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <getConsentFromLocalStorage update on every re-render>
   useEffect(() => {
     if (isDialogOpen) {
       const updatedConsentStates: Record<ConsentKey, boolean> =
@@ -70,7 +65,7 @@ export default function CookieConsentManagePreferences() {
 
       setConsentStates(updatedConsentStates);
     }
-  }, [isDialogOpen]); // Dependency array ensures it runs every time `isDialogOpen` changes
+  }, [isDialogOpen]);
 
   // Function to handle switching
   const handleSwitchChange = (consentKey: ConsentKey, checked: boolean) => {
