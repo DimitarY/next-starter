@@ -130,7 +130,13 @@ export function ProfilePictureCard(props: { user: User }) {
             )}
             <div className="relative">
               <Image
-                src={output?.preview ?? props.user.image ?? "/fallback.svg"}
+                src={
+                  output?.preview
+                    ? output.preview
+                    : props.user.image && props.user.image.length > 0
+                      ? props.user.image
+                      : "/fallback.svg"
+                }
                 onClick={() => inputRef.current?.click()}
                 alt="Profile Picture"
                 width={128}
