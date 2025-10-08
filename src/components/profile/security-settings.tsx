@@ -1252,7 +1252,7 @@ function TwoFactorStatus({
           </p>
         </div>
         {isTwoFactorEnabled ? (
-          <Dialog>
+          <Dialog modal={false}>
             <DialogTrigger asChild>
               <Button className="cursor-pointer" variant="destructive">
                 {DisableTwoFactorIsPending ? (
