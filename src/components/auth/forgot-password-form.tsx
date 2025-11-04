@@ -34,7 +34,6 @@ export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
 
   const { mutate: ForgotPassword, isPending: ForgotPasswordIsPending } =
     useMutation({
-      // FIXME: There is a server side error when user with given mail is not found but client side is passing
       mutationFn: async (values: z.infer<typeof ForgotPasswordSchema>) => {
         const { error } = await auth.forgetPassword({
           email: values.email,
@@ -135,6 +134,7 @@ export function ForgotPasswordForm({ className }: ForgotPasswordFormProps) {
                       {...field}
                       type="email"
                       disabled={ForgotPasswordIsPending}
+                      autoComplete="email"
                     />
                   </FormControl>
                   <FormMessage />

@@ -186,6 +186,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
                       placeholder="John Doe"
                       {...field}
                       disabled={RegisterMutationIsPending}
+                      autoComplete="name"
                     />
                   </FormControl>
                   <FormMessage />
@@ -204,6 +205,7 @@ export function SignUpForm({ className }: SignUpFormProps) {
                       {...field}
                       type="email"
                       disabled={RegisterMutationIsPending}
+                      autoComplete="email"
                     />
                   </FormControl>
                   <FormMessage />

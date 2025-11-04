@@ -153,6 +153,7 @@ function ChangeName({ className, user }: { className?: string; user: User }) {
                     {...field}
                     disabled={UpdateNameIsPending}
                     placeholder={user.name}
+                    autoComplete="name"
                   />
                 </FormControl>
                 <FormMessage />
@@ -308,6 +309,7 @@ function ChangeEmail({ className, user }: { className?: string; user: User }) {
                     type="email"
                     disabled={UpdateEmailIsPending}
                     placeholder={user.email}
+                    autoComplete="email"
                   />
                 </FormControl>
                 <FormMessage />

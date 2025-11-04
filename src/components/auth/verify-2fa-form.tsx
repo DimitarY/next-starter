@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,7 +19,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { siteConfig } from "@/config/site";
 import { auth } from "@/lib/client/auth";
 import { cn } from "@/lib/utils";
@@ -147,14 +153,34 @@ export function Verify2faForm({ className }: Verify2faFormProps) {
               control={form.control}
               name="verify2fa"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col items-center justify-center">
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Two-factor code"
+                    <InputOTP
+                      maxLength={6}
+                      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
                       {...field}
                       disabled={Verify2faMutationIsPending}
-                    />
+                      autoFocus
+                      onChange={(value) => {
+                        field.onChange(value);
+                        if (value.length === 6) {
+                          form.handleSubmit(onSubmit)();
+                        }
+                      }}
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                      </InputOTPGroup>
+                      <InputOTPSeparator />
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

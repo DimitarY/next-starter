@@ -142,6 +142,7 @@ function MagicLinkForm({ onShowCredentials }: MagicLinkFormProps) {
                     {...field}
                     type="email"
                     disabled={server_MagicLinkIsPending}
+                    autoComplete="email"
                   />
                 </FormControl>
                 <FormMessage />
@@ -299,6 +300,7 @@ function CredentialsForm({ email, onBack }: CredentialsFormProps) {
                       {...field}
                       type="email"
                       disabled={LoginMutationIsPending}
+                      autoComplete="email"
                     />
                   </FormControl>
                   <FormMessage />

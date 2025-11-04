@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import type { Session } from "better-auth";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { AlertCircle, Check, TriangleAlert, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -46,6 +47,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import {
   PasswordInput,
   PasswordInputAdornmentToggle,
@@ -1030,16 +1037,34 @@ function TwoFactorForm() {
                 control={formVerify.control}
                 name="code"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col items-center justify-center">
                     <FormLabel>Verification Code</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        type="text"
-                        placeholder="Enter 6-digit code"
-                        disabled={VerifyAndEnableTwoFactorIsPending}
+                      <InputOTP
                         maxLength={6}
-                      />
+                        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                        {...field}
+                        disabled={VerifyAndEnableTwoFactorIsPending}
+                        autoFocus
+                        onChange={(value) => {
+                          field.onChange(value);
+                          if (value.length === 6) {
+                            formVerify.handleSubmit(onSubmitVerify)();
+                          }
+                        }}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                        </InputOTPGroup>
+                        <InputOTPSeparator />
+                        <InputOTPGroup>
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1682,12 +1707,11 @@ function PasskeyManagement({ className, passkeys }: PasskeyManagementProps) {
         console.log("result", result);
 
         if (result?.error) {
-          // TODO: Error code is not defined as type, but it is defined in the API
           return {
             success: false,
             error: result.error as {
-              code?: string | undefined;
-              message?: string | undefined;
+              code: string;
+              message: string;
               status: number;
               statusText: string;
             },
